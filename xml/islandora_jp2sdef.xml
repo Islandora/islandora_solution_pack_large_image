@@ -19,7 +19,7 @@
                         <audit:componentID/>
                         <audit:responsibility>fedoraAdmin</audit:responsibility>
                         <audit:date>2009-11-12T14:56:59.840Z</audit:date>
-                        <audit:justification>Ingested from local file /Users/aoneill/dev/iiv/iiv/etc/fedora-objects/ilives_jp2Sdef.xml</audit:justification>
+                        <audit:justification>Ingested from local file /Users/aoneill/dev/iiv/iiv/etc/fedora-objects/ilives_jp2sdef.xml</audit:justification>
                     </audit:record>
                     <audit:record ID="AUDREC2">
                         <audit:process type="Fedora API-M"/>
@@ -35,7 +35,7 @@
                         <audit:componentID/>
                         <audit:responsibility>fedoraAdmin</audit:responsibility>
                         <audit:date>2010-06-01T01:40:47.337Z</audit:date>
-                        <audit:justification>Ingested from local file /Users/al/fedora_repository/content_models/ilives_jp2Sdef.xml</audit:justification>
+                        <audit:justification>Ingested from local file /Users/al/fedora_repository/content_models/ilives_jp2sdef.xml</audit:justification>
                     </audit:record>
                 </audit:auditTrail>
             </foxml:xmlContent>
