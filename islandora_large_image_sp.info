@@ -2,7 +2,6 @@
 name = Islandora Large Image Solution Pack
 description = Islandora configurations for persisting and retrieving large images
 dependencies[] = fedora_repository
-
-package = Islandora
-version = 6.1dev
+package = Islandora Solution Pack
+version = 11.2.beta1
 core = 6.x
