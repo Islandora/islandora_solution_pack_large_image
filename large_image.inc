@@ -12,7 +12,7 @@
 class LargeImageProcessor {
 
   function LargeImageProcessor() {
-    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+    module_load_include('inc', 'islandora_repository', 'ObjectHelper');
   }
 
   function createDerivatives($parameterArray = NULL, $dsid, $file, $file_ext) {
@@ -84,8 +84,8 @@ class ShowLargeImagesInFieldSets {
     return theme('fieldset', $fieldset);
   }
   function showJPG() {
-    module_load_include('inc', 'fedora_repository', 'plugins/tagging_form');
-    module_load_include('inc', 'fedora_repository', 'plugins/ShowStreamsInFieldSets');
+    module_load_include('inc', 'islandora_repository', 'plugins/tagging_form');
+    module_load_include('inc', 'islandora_repository', 'plugins/ShowStreamsInFieldSets');
     global $base_url;
     global $user;
 
@@ -112,7 +112,7 @@ class ShowLargeImagesInFieldSets {
       '#title' => t('View'),
       // This will be the content of the tab.
       '#content' => '<img src="'. $base_url .
-        '/fedora/imageapi/'. $this->pid . '/JPG/JPG.jpg'. '" />'. '<p>'. drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
+        '/fedora/imageapi/'. $this->pid . '/JPG/JPG.jpg'. '" />'. '<p>'. drupal_get_form('islandora_repository_image_tagging_form', $this->pid) . '</p>',
     );
 
     return $tabset;
