@@ -35,7 +35,7 @@
                         <audit:componentID/>
                         <audit:responsibility>fedoraAdmin</audit:responsibility>
                         <audit:date>2010-03-12T17:28:34.323Z</audit:date>
-                        <audit:justification>Ingested from local file /Users/aoneill/islandora_repository/content_models/islandora-mods2htmlSdef.xml</audit:justification>
+                        <audit:justification>Ingested from local file /Users/aoneill/fedora_repository/content_models/islandora-mods2htmlSdef.xml</audit:justification>
                     </audit:record>
                     <audit:record ID="AUDREC4">
                         <audit:process type="Fedora API-M"/>
