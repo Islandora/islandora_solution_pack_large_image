@@ -5,32 +5,13 @@
 
 function islandora_large_image_sp_required_fedora_objects() {
 
-
+module_load_include('inc', 'fedora_repository', 'fedora_repository.solutionpacks');
   $module_path = drupal_get_path('module', 'islandora_large_image_sp');
+  $form_name = 'Islandora Large Image MODS Form';
+  $form_xml = file_get_contents("$module_path/xml/mods_large_image.xml");
+  solution_pack_add_form($form_name, $form_xml);
+  solution_pack_add_form_association('islandora:sp_large_image_cmodel', $form_name);
 
-
-  // Put the form in the database
-  $result = db_result(db_query('Select name from {xml_forms} where name = "%s"', 'Islandora Large Image MODS Form'));
-  if (!$result) {
-    $filename = "$module_path/xml/mods_audio.xml";
-    $form_as_string = file_get_contents($filename);
-    $object = new stdClass();
-    $object->name = 'Islandora Large Image MODS Form';
-    $object->form = $form_as_string;
-    $result = drupal_write_record('xml_forms', $object);
-  }
-
-  // Associates the form with the content model
-  $result = db_result(db_query('Select content_model from {islandora_content_model_forms} where  content_model = "%s" and form_name = "%s"', 'islandora:bookCModel', 'Islandora Large Image MODS Form'));
-  if (!$result) {
-    $object = new stdClass();
-    $object->content_model = 'islandora:sp_large_image_cmodel';
-    $object->form_name = 'Islandora Large Image MODS Form';
-    $object->dsid = 'MODS';
-    $object->title_field = "['titleInfo']['title']";
-    $object->transform = 'mods_to_dc.xsl';
-    $result = drupal_write_record('islandora_content_model_forms', $object);
-  }
   
   return array(
     'islandora_large_image_sp' => array(
