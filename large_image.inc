@@ -1,20 +1,30 @@
-
 <?php
 
-// $Id$
-
-/*
- *
- *
- * This Class implements the methods defined in the basic image solution content model
+/**
+ * @file 
+ * LargeImageProcessor and ShowLargeImagesInFieldSets classes
  */
 
+/**
+ * This Class implements the methods defined in the basic image solution content model
+ */
 class LargeImageProcessor {
 
+  /**
+   * Constructor
+   */
   function LargeImageProcessor() {
     module_load_include('inc', 'fedora_repository', 'ObjectHelper');
   }
 
+  /**
+   * Create derivatives
+   * @param type $parameterArray
+   * @param type $dsid
+   * @param type $file
+   * @param type $file_ext
+   * @return type 
+   */
   function createDerivatives($parameterArray = NULL, $dsid, $file, $file_ext) {
     $file_suffix = "_$dsid.$file_ext";
     $return_value = TRUE;
@@ -63,15 +73,26 @@ class LargeImageProcessor {
 
 }
 
+/**
+ * Show Large Image In FieldSets
+ */
 class ShowLargeImagesInFieldSets {
 
   private $pid = NULL;
 
+  /**
+   * Constructor
+   * @param type $pid 
+   */
   function ShowLargeImagesInFieldSets($pid) {
     $this->pid = $pid;
   }
 
-
+  /**
+   * Show JPEG 2000
+   * @param type $collapsed
+   * @return type 
+   */
   function showJP2($collapsed = FALSE) {
     $viewer_url = variable_get('fedora_base_url', '') . '/get/' . $this->pid . '/islandora:viewerSdef/getViewer';
     $html = '<iframe src="' . $viewer_url . '" frameborder="0" style="width: 100%; height: 400px;">Errors: unable to load viewer</iframe>';
@@ -83,6 +104,13 @@ class ShowLargeImagesInFieldSets {
     );
     return theme('fieldset', $fieldset);
   }
+
+  /**
+   * Show JPEG 
+   * @global type $base_url
+   * @global type $user
+   * @return string 
+   */
   function showJPG() {
     module_load_include('inc', 'fedora_repository', 'plugins/tagging_form');
     module_load_include('inc', 'fedora_repository', 'plugins/ShowStreamsInFieldSets');
@@ -96,8 +124,8 @@ class ShowLargeImagesInFieldSets {
       $qs = '?uid=' . base64_encode($user->name . ':' . $user->pass);
     }
 
-    $viewer_url = variable_get('fedora_base_url', 'http://localhost:8080/fedora') . '/get/'. $this->pid . '/islandora:viewerSdef/getViewer'. $qs;
-    $html = '<iframe src="'. $viewer_url . '" scrolling="no" frameborder="0" style="width: 100%; height: 800px;">Errors: unable to load viewer</iframe>';
+    $viewer_url = variable_get('fedora_base_url', 'http://localhost:8080/fedora') . '/get/' . $this->pid . '/islandora:viewerSdef/getViewer' . $qs;
+    $html = '<iframe src="' . $viewer_url . '" scrolling="no" frameborder="0" style="width: 100%; height: 800px;">Errors: unable to load viewer</iframe>';
 
     drupal_add_css(path_to_theme() . '/header-viewer.css', 'theme');
 
@@ -111,12 +139,11 @@ class ShowLargeImagesInFieldSets {
       '#type' => 'tabpage',
       '#title' => t('View'),
       // This will be the content of the tab.
-      '#content' => '<img src="'. $base_url .
-        '/fedora/imageapi/'. $this->pid . '/JPG/JPG.jpg'. '" />'. '<p>'. drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
+      '#content' => '<img src="' . $base_url .
+      '/fedora/imageapi/' . $this->pid . '/JPG/JPG.jpg' . '" />' . '<p>' . drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
     );
 
     return $tabset;
   }
-  
 
 }
