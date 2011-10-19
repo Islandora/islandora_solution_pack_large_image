@@ -7,7 +7,7 @@
  */
 function islandora_large_image_sp_required_fedora_objects() {
 
-  module_load_include('inc', 'fedora_repository', 'fedora_repository.solutionpacks');
+  module_load_include('inc', 'fedora_repository', 'core/fedora_repository.solutionpacks');
   $module_path = drupal_get_path('module', 'islandora_large_image_sp');
   $form_name = 'Islandora Large Image MODS Form';
   $form_xml = file_get_contents("$module_path/xml/mods_large_image.xml");
