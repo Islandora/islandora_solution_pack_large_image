@@ -1,187 +1,113 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<foxml:digitalObject VERSION="1.1" PID="islandora:sp_large_image_cmodel"
-    xmlns:foxml="info:fedora/fedora-system:def/foxml#"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
-    <foxml:objectProperties>
-        <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
-        <foxml:property NAME="info:fedora/fedora-system:def/model#label"
-            VALUE="Large Images Content Model"/>
-        <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE=""/>
-        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate"
-            VALUE="2011-09-14T13:33:10.471Z"/>
-        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate"
-            VALUE="2011-09-14T13:39:51.839Z"/>
-    </foxml:objectProperties>
-    <foxml:datastream ID="DS-COMPOSITE-MODEL" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
-        <foxml:datastreamVersion ID="DS-COMPOSITE-MODEL.7" LABEL="Datastream Composite Model" CREATED="2009-03-11T19:16:18.656Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0" SIZE="2378">
-            <foxml:xmlContent>
-                <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
-                    <dsTypeModel ID="RELS-EXT" ORDERED="false">
-                        <form MIME="text/xml"></form>
-                    </dsTypeModel>
-                    <dsTypeModel ID="DC" ORDERED="false">
-                        <form MIME="text/xml"></form>
-                    </dsTypeModel>
-                    <dsTypeModel ID="MODS" ORDERED="false">
-                        <form MIME="text/xml"></form>
-                    </dsTypeModel>
-                    <dsTypeModel ID="OBJ" ORDERED="false">
-                        <form MIME="image/tiff"></form>
-                    </dsTypeModel>
-                    <dsTypeModel ID="JP2" ORDERED="false">
-                        <form MIME="image/jp2"></form>
-                    </dsTypeModel>
-                    <dsTypeModel ID="JPG" ORDERED="false">
-                        <form MIME="image/jpg"></form>
-                    </dsTypeModel>
-                    <dsTypeModel ID="TN" ORDERED="false">
-                        <form MIME="image/jpg"></form>
-                    </dsTypeModel>
-                </dsCompositeModel>
-            </foxml:xmlContent>
-        </foxml:datastreamVersion>
-    </foxml:datastream>
-    <foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
-        <foxml:datastreamVersion ID="DC.0" LABEL="Dublin Core Record for this object"
-            CREATED="2011-09-14T13:33:10.471Z" MIMETYPE="text/xml"
-            FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="410">
-            <foxml:xmlContent>
-                <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-                    xmlns:dc="http://purl.org/dc/elements/1.1/"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                    <dc:title>Large Images Content Model</dc:title>
-                    <dc:identifier>islandora:sp_large_image_cmodel</dc:identifier>
-                </oai_dc:dc>
-            </foxml:xmlContent>
-        </foxml:datastreamVersion>
-    </foxml:datastream>
-    <foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
-        <foxml:datastreamVersion ID="RELS-EXT.0" LABEL="Fedora RDF Relationships"
-            CREATED="2011-09-14T13:36:01.345Z" MIMETYPE="text/xml" SIZE="547">
-            <foxml:xmlContent>
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                    <rdf:Description rdf:about="info:fedora/islandora:sp_large_image_cmodel">
-                        <hasModel xmlns="info:fedora/fedora-system:def/model#"
-                            rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
-                        <hasService xmlns="info:fedora/fedora-system:def/model#"
-                            rdf:resource="info:fedora/islandora:viewerSdef"/>
-                        <hasService xmlns="info:fedora/fedora-system:def/model#"
-                            rdf:resource="info:fedora/islandora:jp2Sdef"/>
-                    </rdf:Description>
-                </rdf:RDF>
-            </foxml:xmlContent>
-        </foxml:datastreamVersion>
-    </foxml:datastream>
-    <foxml:datastream CONTROL_GROUP="X" ID="ISLANDORACM" STATE="A" VERSIONABLE="true">
-        <foxml:datastreamVersion CREATED="2011-09-13T14:03:03.939Z" ID="ISLANDORACM.0"
-            LABEL="Islandora Content Model - Large Image SP" MIMETYPE="text/xml" SIZE="4093">
-            <foxml:xmlContent>
-                <content_model xmlns="http://www.islandora.ca"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="large_image"
-                    xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
-                    <mimetypes>
-                        <type>image/tiff</type>
-                        <type>image/tif</type>
-                    </mimetypes>
-                    <ingest_rules>
-                        <rule>
-                            <applies_to>image/tiff</applies_to>
-                            <applies_to>image/tif</applies_to>
-                            <ingest_methods>
-                                <ingest_method class="LargeImageProcessor" dsid="JP2"
-                                    file="large_image.inc" method="createDerivatives"
-                                    modified_files_ext="jp2" module="islandora_large_image_sp"/>
-                            </ingest_methods>
-                        </rule>
-                    </ingest_rules>
-                    <datastreams>
-                        <datastream dsid="JPG">
-                            <display_method class="ShowLargeImagesInFieldSets"
-                                file="large_image.inc" method="showJPG"
-                                module="islandora_large_image_sp"/>
-                        </datastream>
-                        <datastream dsid="RELS-EXT"/>
-                        <datastream dsid="DC"/>
-                        <datastream dsid="MODS"/>
-                        <datastream dsid="OBJ" />
-                        <datastream dsid="JP2"/>
-                        <datastream dsid="TN"/>
-                    </datastreams>
-                    <ingest_form dsid="QDC" page="2">
-                        <form_builder_method class="DemoFormBuilder"
-                            file="plugins/DemoFormBuilder.inc" handler="handleQDCForm"
-                            method="buildQDCForm" module=""/>
-                        <form_elements>
-                            <element label="Title/Caption/Image Name" name="dc:title"
-                                required="true" type="textfield">
-                                <description>The name given to the resource</description>
-                            </element>
-                            <element label="Creator/Photographer" name="dc:creator" type="textfield">
-                                <description>An entity primarily responsible for making the content
-                                    of the resource such as a person, organization or
-                                    service.</description>
-                            </element>
-                            <element label="Subject" name="dc:subject" type="select">
-                                <description>Subject</description>
-                                <authoritative_list>
-                                    <item>image</item>
-                                    <item>photograph</item>
-                                    <item>presentation</item>
-                                    <item>art</item>
-                                </authoritative_list>
-                            </element>
-                            <element label="Description" name="dc:description" required="true"
-                                type="textarea">
-                                <description>Description of the Image</description>
-                            </element>
-                            <element label="Publisher" name="dc:publisher" type="textfield">
-                                <description>An entity, (including persons, organizations, or
-                                    services), responsible for making the resource
-                                    available.</description>
-                            </element>
-                            <element label="Contributor" name="dc:contributor" type="textfield">
-                                <description>An entity responsible for contributing to the content
-                                    of the resource such as a person, organization or
-                                    service.</description>
-                            </element>
-                            <element label="Date" name="dc:date" type="textfield">
-                                <description>Temporal scope of the content if known. Date format is
-                                    YYYY-MM-DD (e.g. 1890,1910-10,or 2007-10-23)</description>
-                            </element>
-                            <element label="Resource Type" name="dc:type" type="textfield">
-                                <description>Genre of the content of the resource. Examples include:
-                                    home page, novel, poem, working paper, technical report, essay,
-                                    dictionary.</description>
-                            </element>
-                            <element label="Source" name="dc:source" type="textfield">
-                                <description>A reference to a resource from which the present
-                                    resource is derived.</description>
-                            </element>
-                            <element label="Identifier" name="dc:identifier" type="textfield">
-                                <description>A unique reference to the resource; In this instance,
-                                    the accession number or collection number.</description>
-                            </element>
-                            <element label="Language" name="dc:language" type="select">
-                                <description>The language of the intellectual content of the
-                                    resource.</description>
-                                <authoritative_list>
-                                    <item field="eng">English</item>
-                                    <item field="fre">French</item>
-                                </authoritative_list>
-                            </element>
-                            <element label="Relation" name="dc:relation" type="textfield">
-                                <description>Reference to a related resource.</description>
-                            </element>
-                            <element label="Rights Management" name="dc:rights" type="textarea">
-                                <description>Information about intellectual property rights,
-                                    copyright, and various property rights.</description>
-                            </element>
-                        </form_elements>
-                    </ingest_form>
-                </content_model>
-            </foxml:xmlContent>
-        </foxml:datastreamVersion>
-    </foxml:datastream>
-</foxml:digitalObject>
+<content_model xmlns="http://www.islandora.ca"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="large_image"
+    xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+    <mimetypes>
+        <type>image/tiff</type>
+        <type>image/tif</type>
+    </mimetypes>
+    <ingest_rules>
+        <rule>
+            <applies_to>image/tiff</applies_to>
+
+            <applies_to>image/tif</applies_to>
+            <ingest_methods>
+                <ingest_method class="LargeImageProcessor" dsid="JP2"
+                    file="large_image.inc" method="createDerivatives"
+                    modified_files_ext="jp2" module="islandora_large_image_sp"/>
+            </ingest_methods>
+        </rule>
+    </ingest_rules>
+    <datastreams>
+        <datastream dsid="JPG">
+
+            <display_method class="ShowLargeImagesInFieldSets"
+                file="large_image.inc" method="showJPG"
+                module="islandora_large_image_sp"/>
+        </datastream>
+        <datastream dsid="RELS-EXT"/>
+        <datastream dsid="DC"/>
+        <datastream dsid="MODS"/>
+        <datastream dsid="OBJ" />
+        <datastream dsid="JP2"/>
+        <datastream dsid="TN"/>
+    </datastreams>
+
+    <ingest_form dsid="QDC" page="2">
+        <form_builder_method class="DemoFormBuilder"
+            file="plugins/DemoFormBuilder.inc" handler="handleQDCForm"
+            method="buildQDCForm" module=""/>
+        <form_elements>
+            <element label="Title/Caption/Image Name" name="dc:title"
+                required="true" type="textfield">
+                <description>The name given to the resource</description>
+            </element>
+            <element label="Creator/Photographer" name="dc:creator" type="textfield">
+                <description>An entity primarily responsible for making the content
+                    of the resource such as a person, organization or
+                    service.</description>
+
+            </element>
+            <element label="Subject" name="dc:subject" type="select">
+                <description>Subject</description>
+                <authoritative_list>
+                    <item>image</item>
+                    <item>photograph</item>
+                    <item>presentation</item>
+
+                    <item>art</item>
+                </authoritative_list>
+            </element>
+            <element label="Description" name="dc:description" required="true"
+                type="textarea">
+                <description>Description of the Image</description>
+            </element>
+            <element label="Publisher" name="dc:publisher" type="textfield">
+                <description>An entity, (including persons, organizations, or
+                    services), responsible for making the resource
+                    available.</description>
+
+            </element>
+            <element label="Contributor" name="dc:contributor" type="textfield">
+                <description>An entity responsible for contributing to the content
+                    of the resource such as a person, organization or
+                    service.</description>
+            </element>
+            <element label="Date" name="dc:date" type="textfield">
+                <description>Temporal scope of the content if known. Date format is
+                    YYYY-MM-DD (e.g. 1890,1910-10,or 2007-10-23)</description>
+            </element>
+            <element label="Resource Type" name="dc:type" type="textfield">
+
+                <description>Genre of the content of the resource. Examples include:
+                    home page, novel, poem, working paper, technical report, essay,
+                    dictionary.</description>
+            </element>
+            <element label="Source" name="dc:source" type="textfield">
+                <description>A reference to a resource from which the present
+                    resource is derived.</description>
+            </element>
+            <element label="Identifier" name="dc:identifier" type="textfield">
+                <description>A unique reference to the resource; In this instance,
+                    the accession number or collection number.</description>
+
+            </element>
+            <element label="Language" name="dc:language" type="select">
+                <description>The language of the intellectual content of the
+                    resource.</description>
+                <authoritative_list>
+                    <item field="eng">English</item>
+                    <item field="fre">French</item>
+                </authoritative_list>
+
+            </element>
+            <element label="Relation" name="dc:relation" type="textfield">
+                <description>Reference to a related resource.</description>
+            </element>
+            <element label="Rights Management" name="dc:rights" type="textarea">
+                <description>Information about intellectual property rights,
+                    copyright, and various property rights.</description>
+            </element>
+        </form_elements>
+
+    </ingest_form>
+</content_model>
