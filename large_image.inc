@@ -21,6 +21,7 @@ class LargeImageProcessor {
 
     $output = array();
 
+    $_SESSION['fedora_ingest_files']['FULL_SIZE'] = $file;
     exec('kdu_compress -i "' . $file . '" -o "' . $file . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $returnValue);
 
     if ($returnValue == '0') {
@@ -44,7 +45,7 @@ class LargeImageProcessor {
     else {
       ObjectHelper::warnIfMisconfigured('ImageMagick');
     }
-    exec("convert {$file}[0] -thumbnail x2000 -thumbnail x450  -resize '450x<' -resize 50% -fuzz 1% -trim +repage -gravity center -crop 200x200+0+0 +repage -format jpg -quality 100  $file-tn.jpg", $output, $returnValue);
+    exec("convert \"{$file}\"[0] -thumbnail x2000 -thumbnail x450  -resize '450x<' -resize 50% -fuzz 1% -trim +repage -gravity center -crop 200x200+0+0 +repage -format jpg -quality 100  $file-tn.jpg", $output, $returnValue);
     if ($returnValue == '0') {
       $_SESSION['fedora_ingest_files']["TN"] = $file . '-tn.jpg';
     }
@@ -71,7 +72,6 @@ class ShowLargeImagesInFieldSets {
     $this->pid = $pid;
   }
 
-
   function showJP2($collapsed = FALSE) {
     $viewer_url = variable_get('fedora_base_url', '') . '/get/' . $this->pid . '/islandora:viewerSdef/getViewer';
     $html = '<iframe src="' . $viewer_url . '" frameborder="0" style="width: 100%; height: 400px;">Errors: unable to load viewer</iframe>';
@@ -83,6 +83,7 @@ class ShowLargeImagesInFieldSets {
     );
     return theme('fieldset', $fieldset);
   }
+
   function showJPG() {
     module_load_include('inc', 'fedora_repository', 'plugins/tagging_form');
     module_load_include('inc', 'fedora_repository', 'plugins/ShowStreamsInFieldSets');
@@ -96,8 +97,8 @@ class ShowLargeImagesInFieldSets {
       $qs = '?uid=' . base64_encode($user->name . ':' . $user->pass);
     }
 
-    $viewer_url = variable_get('fedora_base_url', 'http://localhost:8080/fedora') . '/get/'. $this->pid . '/islandora:viewerSdef/getViewer'. $qs;
-    $html = '<iframe src="'. $viewer_url . '" scrolling="no" frameborder="0" style="width: 100%; height: 800px;">Errors: unable to load viewer</iframe>';
+    $viewer_url = variable_get('fedora_base_url', 'http://localhost:8080/fedora') . '/get/' . $this->pid . '/islandora:viewerSdef/getViewer' . $qs;
+    $html = '<iframe src="' . $viewer_url . '" scrolling="no" frameborder="0" style="width: 100%; height: 800px;">Errors: unable to load viewer</iframe>';
 
     drupal_add_css(path_to_theme() . '/header-viewer.css', 'theme');
 
@@ -111,12 +112,11 @@ class ShowLargeImagesInFieldSets {
       '#type' => 'tabpage',
       '#title' => t('View'),
       // This will be the content of the tab.
-      '#content' => '<img src="'. $base_url .
-        '/fedora/imageapi/'. $this->pid . '/JPG/JPG.jpg'. '" />'. '<p>'. drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
+      '#content' => '<img src="' . $base_url .
+      '/fedora/imageapi/' . $this->pid . '/JPG/JPG.jpg' . '" />' . '<p>' . drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
     );
 
     return $tabset;
   }
-  
 
 }
