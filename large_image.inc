@@ -31,6 +31,7 @@ class LargeImageProcessor {
 
     $output = array();
 
+    $_SESSION['fedora_ingest_files']['FULL_SIZE'] = $file;
     exec('kdu_compress -i "' . $file . '" -o "' . $file . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $returnValue);
 
     if ($returnValue == '0') {
@@ -54,7 +55,7 @@ class LargeImageProcessor {
     else {
       ObjectHelper::warnIfMisconfigured('ImageMagick');
     }
-    exec("convert {$file}[0] -thumbnail x2000 -thumbnail x450  -resize '450x<' -resize 50% -fuzz 1% -trim +repage -gravity center -crop 200x200+0+0 +repage -format jpg -quality 100  $file-tn.jpg", $output, $returnValue);
+    exec("convert \"{$file}\"[0] -thumbnail x2000 -thumbnail x450  -resize '450x<' -resize 50% -fuzz 1% -trim +repage -gravity center -crop 200x200+0+0 +repage -format jpg -quality 100  $file-tn.jpg", $output, $returnValue);
     if ($returnValue == '0') {
       $_SESSION['fedora_ingest_files']["TN"] = $file . '-tn.jpg';
     }
@@ -142,8 +143,6 @@ class ShowLargeImagesInFieldSets {
       '#content' => '<img src="' . $base_url .
       '/fedora/imageapi/' . $this->pid . '/JPG/JPG.jpg' . '" />' . '<p>' . drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
     );
-
     return $tabset;
   }
-
 }
