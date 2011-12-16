@@ -48,7 +48,8 @@ class LargeImageProcessor {
     else {
       ObjectHelper::warnIfMisconfigured('Kakadu');
     }
-    exec("convert  -resize 800 \"{$file}\"[0]  \"$file-med.jpg\"", $output, $returnValue);
+
+    exec("convert -resize 600x800\> \"{$file}\"[0]  \"$file-med.jpg\"", $output, $returnValue);
     if ($returnValue == '0') {
       $_SESSION['fedora_ingest_files']["JPG"] = $file . '-med.jpg';
     }
