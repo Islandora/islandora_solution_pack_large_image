@@ -31,19 +31,11 @@ class LargeImageProcessor {
 
     $output = array();
 
-    $_SESSION['fedora_ingest_files']['FULL_SIZE'] = $file;
+    $_SESSION['fedora_ingest_files']['JP2'] = $file;
     exec('kdu_compress -i "' . $file . '" -o "' . $file . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $returnValue);
 
     if ($returnValue == '0') {
       $_SESSION['fedora_ingest_files'][$dsid] = $file . $file_suffix;
-    }
-    else {
-      ObjectHelper::warnIfMisconfigured('Kakadu');
-    }
-
-    exec('kdu_compress -i "' . $file . '" -o "' . $file . "_lossless.jp2" . '" -rate -,0.5 Clayers=2 Creversible=yes Clevels=8 "Cprecincts={256,256},{256,256},{128,128}" Corder="RPCL" ORGgen_plt="yes" ORGtparts="R" Cblk="{32,32}"', $output, $returnValue);
-    if ($returnValue == '0') {
-      $_SESSION['fedora_ingest_files']["LOSSLESS_JP2"] = $file . '_lossless.jp2';
     }
     else {
       ObjectHelper::warnIfMisconfigured('Kakadu');
