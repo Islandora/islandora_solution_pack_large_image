@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file 
+ * @file
  * LargeImageProcessor and ShowLargeImagesInFieldSets classes
  */
 
@@ -23,15 +23,14 @@ class LargeImageProcessor {
    * @param type $dsid
    * @param type $file
    * @param type $file_ext
-   * @return type 
+   * @return type
    */
   function createDerivatives($parameterArray = NULL, $dsid, $file, $file_ext) {
     $file_suffix = "_$dsid.$file_ext";
     $return_value = TRUE;
 
     $output = array();
-
-    $_SESSION['fedora_ingest_files']['FULL_SIZE'] = $file;
+    $_SESSION['fedora_ingest_files']['JP2'] = $file;
     exec('kdu_compress -i "' . $file . '" -o "' . $file . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $returnValue);
 
     if ($returnValue == '0') {
@@ -41,21 +40,14 @@ class LargeImageProcessor {
       ObjectHelper::warnIfMisconfigured('Kakadu');
     }
 
-    exec('kdu_compress -i "' . $file . '" -o "' . $file . "_lossless.jp2" . '" -rate -,0.5 Clayers=2 Creversible=yes Clevels=8 "Cprecincts={256,256},{256,256},{128,128}" Corder="RPCL" ORGgen_plt="yes" ORGtparts="R" Cblk="{32,32}"', $output, $returnValue);
-    if ($returnValue == '0') {
-      $_SESSION['fedora_ingest_files']["LOSSLESS_JP2"] = $file . '_lossless.jp2';
-    }
-    else {
-      ObjectHelper::warnIfMisconfigured('Kakadu');
-    }
-    exec("convert  -resize 800 \"{$file}\"[0]  \"$file-med.jpg\"", $output, $returnValue);
+    exec("convert -resize 600x800\> \"{$file}\"[0]  \"$file-med.jpg\"", $output, $returnValue);
     if ($returnValue == '0') {
       $_SESSION['fedora_ingest_files']["JPG"] = $file . '-med.jpg';
     }
     else {
       ObjectHelper::warnIfMisconfigured('ImageMagick');
     }
-    exec("convert \"{$file}\"[0] -thumbnail x2000 -thumbnail x450  -resize '450x<' -resize 50% -fuzz 1% -trim +repage -gravity center -crop 200x200+0+0 +repage -format jpg -quality 100  $file-tn.jpg", $output, $returnValue);
+    exec("convert \"{$file}\"[0] -thumbnail x2000 -thumbnail x450  -resize '450x<' -resize 50% -fuzz 1% -trim +repage -gravity center -crop 200x200+0+0 +repage -format jpg -quality 100  \"$file-tn.jpg\"", $output, $returnValue);
     if ($returnValue == '0') {
       $_SESSION['fedora_ingest_files']["TN"] = $file . '-tn.jpg';
     }
@@ -63,6 +55,15 @@ class LargeImageProcessor {
       ObjectHelper::warnIfMisconfigured('ImageMagick');
     }
 
+    $path_info = pathinfo($file);
+    $newfile = str_replace('.' . $path_info['extension'], '_EXIF.xml', $file);
+    $returnValue = TRUE;
+    $output = array();
+    exec('exiftool -X ' . escapeshellarg($file) . '', $output, $returnValue);
+    if ($returnValue == 0) {
+      file_put_contents($newfile, implode("\n", $output));
+      $_SESSION['fedora_ingest_files']["EXIF"] = $newfile;
+    }
     if ($returnValue == '0') {
       return TRUE;
     }
@@ -83,7 +84,7 @@ class ShowLargeImagesInFieldSets {
 
   /**
    * Constructor
-   * @param type $pid 
+   * @param type $pid
    */
   function ShowLargeImagesInFieldSets($pid) {
     $this->pid = $pid;
@@ -92,7 +93,7 @@ class ShowLargeImagesInFieldSets {
   /**
    * Show JPEG 2000
    * @param type $collapsed
-   * @return type 
+   * @return type
    */
   function showJP2($collapsed = FALSE) {
     $viewer_url = variable_get('fedora_base_url', '') . '/get/' . $this->pid . '/islandora:viewerSdef/getViewer';
@@ -107,10 +108,10 @@ class ShowLargeImagesInFieldSets {
   }
 
   /**
-   * Show JPEG 
+   * Show JPEG
    * @global type $base_url
    * @global type $user
-   * @return string 
+   * @return string
    */
   function showJPG() {
     module_load_include('inc', 'fedora_repository', 'plugins/tagging_form');
@@ -145,4 +146,5 @@ class ShowLargeImagesInFieldSets {
     );
     return $tabset;
   }
+
 }
