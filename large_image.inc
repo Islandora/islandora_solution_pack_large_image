@@ -30,7 +30,6 @@ class LargeImageProcessor {
     $return_value = TRUE;
 
     $output = array();
-
     $_SESSION['fedora_ingest_files']['JP2'] = $file;
     exec('kdu_compress -i "' . $file . '" -o "' . $file . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $returnValue);
 
@@ -56,6 +55,15 @@ class LargeImageProcessor {
       ObjectHelper::warnIfMisconfigured('ImageMagick');
     }
 
+    $path_info = pathinfo($file);
+    $newfile = str_replace('.' . $path_info['extension'], '_EXIF.xml', $file);
+    $returnValue = TRUE;
+    $output = array();
+    exec('exiftool -X ' . escapeshellarg($file) . '', $output, $returnValue);
+    if ($returnValue == 0) {
+      file_put_contents($newfile, implode("\n", $output));
+      $_SESSION['fedora_ingest_files']["EXIF"] = $newfile;
+    }
     if ($returnValue == '0') {
       return TRUE;
     }
@@ -138,4 +146,5 @@ class ShowLargeImagesInFieldSets {
     );
     return $tabset;
   }
+
 }
