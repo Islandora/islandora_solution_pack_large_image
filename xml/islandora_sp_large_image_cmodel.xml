@@ -14,6 +14,8 @@
                 <ingest_method class="LargeImageProcessor" dsid="JP2"
                     file="large_image.inc" method="createDerivatives"
                     modified_files_ext="jp2" module="islandora_large_image_sp"/>
+                <ingest_method class="fits" dsid="FITS" file="plugins/fits.inc" method="extractFits" module="fedora_repository" modified_files_ext="">
+                </ingest_method>
             </ingest_methods>
         </rule>
     </ingest_rules>
@@ -30,6 +32,7 @@
         <datastream dsid="OBJ" />
         <datastream dsid="JP2"/>
         <datastream dsid="TN"/>
+        <datastream dsid="FITS"/>
     </datastreams>
 
     <ingest_form dsid="QDC" page="2">
