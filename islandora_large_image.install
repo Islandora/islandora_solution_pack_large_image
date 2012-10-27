@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * islandora_large_image.install
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function islandora_large_image_requirements($phase) {
+  if ($phase == 'install') {
+    module_load_include('inc', 'islandora', 'includes/tuque');
+    if (!IslandoraTuque::exists()) {
+      return array(array(
+          'title' => 'Tuque',
+          'description' => 'The Islandora Large Image solution pack requires the Tuque library.',
+          'severity' => REQUIREMENT_ERROR,
+          ));
+    }
+  }
+}
+
+/**
+ * Implements hook_install().
+ *
+ * @see islandora_large_image_islandora_required_objects()
+ */
+function islandora_large_image_install() {
+  module_load_include('inc', 'islandora', 'includes/solution_packs');
+  // install solution pack object(s)
+  islandora_install_solution_pack('islandora_large_image');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function islandora_large_image_uninstall() {
+  module_load_include('inc', 'islandora', 'includes/solution_packs');
+  // uninstall callback
+  islandora_install_solution_pack('islandora_large_image', 'uninstall');
+}

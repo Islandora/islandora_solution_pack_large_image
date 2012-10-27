@@ -8,7 +8,6 @@
     <ingest_rules>
         <rule>
             <applies_to>image/tiff</applies_to>
-
             <applies_to>image/tif</applies_to>
             <ingest_methods>
                 <ingest_method class="LargeImageProcessor" dsid="JP2"
