@@ -17,7 +17,9 @@
   <div class="islandora-large-image-content-wrapper clearfix">
     <?php if (isset($islandora_medium_img)): ?>
       <div class="islandora-large-image-content">
-      <?php if (isset($islandora_full_url)): ?>
+      <?php if (isset($islandora_viewer)): ?>
+        <?php print $islandora_viewer; ?>
+      <?php elseif (isset($islandora_full_url)): ?>
         <?php print l($islandora_medium_img, $islandora_full_url, array('html' => TRUE)); ?>
       <?php elseif (isset($islandora_medium_img)): ?>
         <?php print $islandora_medium_img; ?>

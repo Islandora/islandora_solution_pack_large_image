@@ -94,7 +94,11 @@ function islandora_large_image_theme($existing, $type, $theme, $path) {
       // and templates will be able to have have a pid appended to the template name to overide a template on a per object basis
       //an example template would be named islandora-basic-image--islandora-27.tpl.phps
       'variables' => array('islandora_object' => NULL),
-    )
+    ),
+    'islandora_large_image_viewers_table' => array(
+      'file' => 'admin/islandora_large_image.admin.inc',
+      'render element' => 'form',
+    ),
   );
 }
 
@@ -165,38 +169,102 @@ function islandora_large_image_islandora_ingest_post_ingest($object) {
  *   an array of variables that will be passed to the theme function
  */
 function islandora_large_image_preprocess_islandora_large_image(&$variables) {
+  global $base_url;
+
+  // include js
   drupal_add_js('misc/form.js');
   drupal_add_js('misc/collapse.js');
   $islandora_object = $variables['islandora_object'];
   $repository = $islandora_object->repository;
   module_load_include('inc', 'islandora', 'includes/islandora_dublin_core');
   module_load_include('inc', 'islandora', 'includes/datastream');
-
+  // get dc metadata
   try {
     $dc = $islandora_object['DC']->content;
     $dc_object = Dublin_Core::import_from_xml_string($dc);
   } catch (Exception $e) {
     drupal_set_message(t('Error retrieving object %s %t', array('%s' => $islandora_object->id, '%t' => $e->getMessage())), 'error', FALSE);
   }
+  // set variables
   $variables['islandora_dublin_core'] = isset($dc_object) ? $dc_object : NULL;
   $variables['dc_array'] = isset($dc_object) ? $dc_object->as_formatted_array() : array();
   $variables['islandora_object_label'] = $islandora_object->label;
   $variables['theme_hook_suggestions'][] = 'islandora_large_image__' . str_replace(':', '_', $islandora_object->id);
   $variables['parent_collections'] = islandora_datastream_get_parents($islandora_object);
-  global $base_url;
+
+  // set OBJ
   if (isset($islandora_object['OBJ'])) {
     $full_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/OBJ/view';
     $variables['islandora_full_url'] = $full_size_url;
     $variables['islandora_full_img'] = '<img src="' . $full_size_url . '"/>';
   }
+  // set Thumbnail
   if (isset($islandora_object['TN'])) {
     $thumbnail_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/TN/view';
     $variables['islandora_thumbnail_img'] = '<img src="' . $thumbnail_size_url . '"/>';
   }
+  // set medium sized JPG
   if (isset($islandora_object['JPG'])) {
     $medium_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/JPG/view';
     $variables['islandora_medium_img'] = '<img src="' . $medium_size_url . '"/>';
   }
+  // viewer
+  $viewer_id = _islandora_large_image_get_viewer_id();
+  if ($viewer_id !== FALSE AND $viewer_id != 'none') {
+    // get function callback
+    $viewer_callback = _islandora_large_image_get_viewer_callback($viewer_id);
+    // get image url
+    $image_url = _islandora_large_image_get_viewer_url($islandora_object->id);
+    // call viewer
+    $variables['islandora_viewer'] = $viewer_callback($image_url);
+  }
 }
 
+/**
+ * Get the url to be passed to the viewer.
+ */
+function _islandora_large_image_get_viewer_url($object_id = NULL) {
+  global $base_url;
+  if ($object_id !== NULL) {
+    // get viewer settings
+    $viewers_config = variable_get('islandora_large_image_viewers', array());
+    if (empty($viewers_config)) {
+      $dsid = 'JPG'; // @TODO: spreading defaults all over. should this come from a module_invoke_all?
+    }
+    else {
+      $viewer = $viewers_config['default'];
+      $dsid = $viewers_config['dsid'][$viewer];
+    }
+    // create url
+    $url = $base_url . '/islandora/object/' . $object_id . '/datastream/' . $dsid . '/view';
+    return $url;
+  }
+  return FALSE;
+}
+
+/**
+ * Get id of the enabled viewer.
+ */
+function _islandora_large_image_get_viewer_id() {
+  $viewers_config = variable_get('islandora_large_image_viewers', array());
+  if (!empty($viewers_config)) {
+    return $viewers_config['default'];
+  }
+  return FALSE;
+}
+
+/**
+ * Get callback function for a viewer.
+ */
+function _islandora_large_image_get_viewer_callback($viewer_id = NULL) {
+  if ($viewer_id !== NULL) {
+    // get defined viewers
+    $viewers = module_invoke_all('islandora_large_image_get_viewer');
+    if (isset($viewers[$viewer_id]['callback'])) {
+      // return callback function
+      return $viewers[$viewer_id]['callback'];      
+    }
+  }
+  return FALSE;
+}
 
