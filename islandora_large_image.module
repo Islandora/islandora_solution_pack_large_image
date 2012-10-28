@@ -216,7 +216,9 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
     // get image url
     $image_url = _islandora_large_image_get_viewer_url($islandora_object->id);
     // call viewer
-    $variables['islandora_viewer'] = $viewer_callback($image_url);
+    if ($viewer_callback !== FALSE) {
+      $variables['islandora_viewer'] = $viewer_callback($image_url);      
+    }
   }
 }
 

@@ -8,8 +8,12 @@ TODO:
 high
 
 - evaluate current implementation
+- form ingest
+- make sure derivatives creation works
 - check for code reusablity
 -- remove variables in uninstall hook
+- documentation
+- add islandora_large_image.api.php
 
 medium
 

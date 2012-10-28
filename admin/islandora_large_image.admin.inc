@@ -18,7 +18,7 @@ function islandora_large_image_admin($form, &$form_state) {
   $form['islandora_large_image_use_for_default_tab'] = array(
     '#type' => 'checkbox',
     '#title' => t('Provide the view for the default tab'),
-    '#default_value' => variable_get('islandora_large_image_use_for_default_tab', TRUE),
+    '#default_value' => variable_get('islandora_large_image_use_for_default_tab', 1),
     '#description' => t('Should this module provide the view for the default view tab.  If you are seeing unexpected content
       on a view tab you may have multiple modules configured to provide content for the default tab.'),
     '#weight' => -10
@@ -35,55 +35,67 @@ function islandora_large_image_admin($form, &$form_state) {
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
-  // viewers table
-  $form['viewers']['islandora_large_image_viewers'] = array(
-    '#type' => 'item',
-    '#title' => t('Viewers'),
-    '#description' => t('Preferred viewer to display the large image. These may be provided by third-party modules. Fill out a datastream ID to pass to the viewer.'),
-    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in
-    '#theme' => 'islandora_large_image_viewers_table',
-  );
 
-  // table loop
-  foreach ($viewers as $name => $profile) {
-
-    $options[$name] = '';
-
-    // machine name
-    $form['viewers']['islandora_large_image_viewers']['name'][$name] = array(
-      '#type' => 'hidden',
-      '#value' => $name,
-    );
-    // label
-    $form['viewers']['islandora_large_image_viewers']['label'][$name] = array(
+  if (!empty($viewers)) {
+    // viewers table
+    $form['viewers']['islandora_large_image_viewers'] = array(
       '#type' => 'item',
-      '#markup' => $profile['label'],
+      '#title' => t('Select a viewer'),
+      '#description' => t('Preferred viewer to display the large image. These may be provided by third-party modules. Fill out a datastream ID to pass to the viewer.'),
+      '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in
+      '#theme' => 'islandora_large_image_viewers_table',
     );
-    // description
-    $form['viewers']['islandora_large_image_viewers']['description'][$name] = array(
-      '#type' => 'item',
-      '#markup' => $profile['description'],
-    );
-    // DSID
-    if ($name != 'none') {
-      $form['viewers']['islandora_large_image_viewers']['dsid'][$name] = array(
-        '#type' => 'textfield',
-        '#size' => 15,
-        '#default_value' => !empty($viewers_config) ? $viewers_config['dsid'][$name] : (isset($profile['default_dsid']) ? $profile['default_dsid'] : ''),
-      );  
+
+    // table loop
+    foreach ($viewers as $name => $profile) {
+  
+      $options[$name] = '';
+  
+      // machine name
+      $form['viewers']['islandora_large_image_viewers']['name'][$name] = array(
+        '#type' => 'hidden',
+        '#value' => $name,
+      );
+      // label
+      $form['viewers']['islandora_large_image_viewers']['label'][$name] = array(
+        '#type' => 'item',
+        '#markup' => $profile['label'],
+      );
+      // description
+      $form['viewers']['islandora_large_image_viewers']['description'][$name] = array(
+        '#type' => 'item',
+        '#markup' => $profile['description'],
+      );
+      // DSID
+      if ($name != 'none') {
+        $form['viewers']['islandora_large_image_viewers']['dsid'][$name] = array(
+          '#type' => 'textfield',
+          '#size' => 15,
+          '#default_value' => !empty($viewers_config) ? $viewers_config['dsid'][$name] : (isset($profile['default_dsid']) ? $profile['default_dsid'] : ''),
+        );  
+      }
+      // configuration url
+      $form['viewers']['islandora_large_image_viewers']['configuration'][$name] = array(
+        '#type' => 'item',
+        '#markup' => (isset($profile['configuration']) AND $profile['configuration'] != '') ? l(t('configure'), $profile['configuration']) : '',
+      );
     }
-    // configuration url
-    $form['viewers']['islandora_large_image_viewers']['configuration'][$name] = array(
-      '#type' => 'item',
-      '#markup' => (isset($profile['configuration']) AND $profile['configuration'] != '') ? l(t('configure'), $profile['configuration']) : '',
+    // radios
+    $form['viewers']['islandora_large_image_viewers']['default'] = array(
+      '#type' => 'radios',
+      '#options' => isset($options) ? $options : array(),
+      '#default_value' => !empty($viewers_config) ? $viewers_config['default'] : 'none',
     );
   }
-  // radios
-  $form['viewers']['islandora_large_image_viewers']['default'] = array(
-    '#type' => 'radios',
-    '#options' => $options,
-    '#default_value' => !empty($viewers_config) ? $viewers_config['default'] : 'default',
-  );
+  else {
+    // No viewers found
+    $form['viewers']['islandora_large_image_no_viewers'] = array(
+      '#markup' => t('No viewers detected.'),
+    );
+    // remove viewers variable
+    variable_del('islandora_large_image_viewers');
+  }
+  
   
   // actions
   $form['actions'] = array(
