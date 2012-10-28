@@ -228,16 +228,13 @@ function _islandora_large_image_get_viewer_url($object_id = NULL) {
   if ($object_id !== NULL) {
     // get viewer settings
     $viewers_config = variable_get('islandora_large_image_viewers', array());
-    if (empty($viewers_config)) {
-      $dsid = 'JPG'; // @TODO: spreading defaults all over. should this come from a module_invoke_all?
-    }
-    else {
+    if (!empty($viewers_config) AND isset($viewers_config['default'])) {
       $viewer = $viewers_config['default'];
       $dsid = $viewers_config['dsid'][$viewer];
+      // create url
+      $url = $base_url . '/islandora/object/' . $object_id . '/datastream/' . $dsid . '/view';
+      return $url;
     }
-    // create url
-    $url = $base_url . '/islandora/object/' . $object_id . '/datastream/' . $dsid . '/view';
-    return $url;
   }
   return FALSE;
 }
