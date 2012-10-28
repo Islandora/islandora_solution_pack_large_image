@@ -1,3 +1,16 @@
 Large Image Solution Pack for Islandora
 Load all required Fedora objects, and creates empty collection object
 to accept tiff's and create deriviatives.
+
+TODO:
+=====
+
+high
+
+- evaluate current implementation
+- check for code reusablity
+-- remove variables in uninstall hook
+
+medium
+
+low
