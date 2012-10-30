@@ -27,23 +27,28 @@ function islandora_large_image_create_all_derivatives($object) {
   $file_name = str_replace(':', '-', $object->id);
   // the original file as a temp file
   $original_file = file_save_data($object['OBJ']->content, 'temporary://' . $file_name . 'OBJ.' . $ext);
-  
-  // convert from .tif to .jpeg2000
-  $jp2_file = islandora_large_image_create_derivative_kakadu($original_file, 'JP2', 'jp2');
-  if ($jp2_file) {
-    islandora_large_image_add_datastream($object, 'JP2', $jp2_file);
-  }
-  
-  // create thumbnail image and add as datastream
-  islandora_large_image_create_derivative_imagemagick($jp2_file, $object, 'TN', 200, 200); // derive from jp2 image
-  // create medium size image and add as datastream
-  islandora_large_image_create_derivative_imagemagick($jp2_file, $object, 'MEDIUM', 600, 800); // note: D6 does 500x700
-  // @TODO: create EXIF?  
 
-  
-  
-  
-  
+
+  // convert from .tif to .jpeg2000
+  $jp2_file = file_copy($original_file, 'temporary://' . $file_name . 'JP2.jp2');
+  $jp2_file = islandora_large_image_create_derivative_kakadu($jp2_file, 'JP2', 'jp2');
+  if ($jp2_file) {
+    islandora_large_image_add_datastream($object, 'JP2', $jp2_file, 'image/jp2');
+  }
+
+/*
+  $tn_file = file_copy($original_file, 'temporary://' . $file_name . 'TN.' . $ext);
+  if (islandora_basic_image_create_derivative($tn_file, 200, 200)) {
+    islandora_basic_image_add_datastream($object, 'TN', $tn_file);
+  }
+*/
+
+  // create thumbnail image and add as datastream
+  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'TN', 200, 200); // derive from jp2 image
+  // create medium size image and add as datastream
+  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'JPG', 600, 800); // note: D6 does 500x700
+  // @TODO: create EXIF
+
   // remove temp file // @TODO: remove temp jp2 file too?
   file_delete($original_file);
 }
@@ -55,6 +60,7 @@ function islandora_large_image_create_all_derivatives($object) {
  *   stdclass
  *
  * @TODO: could this be a generic function? eg: islandora_create_derivative($file, $width, $height). ?
+ * @TODO: remove. large image doesn't need this.
  */
 function islandora_large_image_create_derivative($file, $width, $height) {
   // get file path
@@ -78,19 +84,21 @@ function islandora_large_image_create_derivative($file, $width, $height) {
  * @TODO: make reusable?
  */
 function islandora_large_image_create_derivative_imagemagick($original, $object, $dsid, $width, $height) {
-
+  $fid = $original->fid;
   $source = drupal_realpath($original->uri) . '[0]';
   $temp = drupal_tempnam('temporary://', $dsid);
   $dest = drupal_realpath($temp);
 
+  // set arguments
   $args['quality'] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
   $args['previewsize'] = '-resize ' . escapeshellarg("{$width}x{$height}");
-
+  // set context
   $context = array(
     'source' => $source,
     'destination' => $dest,
   );
 
+  // availablity to alter the arguments
   drupal_alter('imagemagick_arguments', $args, $context);
   // To make use of ImageMagick 6's parenthetical command grouping we need to make
   // the $source image the first parameter and $dest the last.
@@ -101,8 +109,9 @@ function islandora_large_image_create_derivative_imagemagick($original, $object,
     return FALSE;
   }
 
-  islandora_large_image_add_datastream($object, $dsid, $dest);
-  file_unmanaged_delete($dest);
+  islandora_large_image_add_datastream($object, $dsid, $dest, 'image/jpeg');
+//  file_unmanaged_delete($dest);
+/* file_delete($dest); */
 }
 
 /**
@@ -114,11 +123,14 @@ function islandora_large_image_create_derivative_kakadu($file, $dsid, $file_ext)
   $return_value = TRUE;
   $output = array();
 
+  $file_path = drupal_realpath($file->uri);
+
   // .tif to .jp2 file
-  exec('kdu_compress -i "' . $file . '" -o "' . $file . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $return_value);
+  exec('kdu_compress -i "' . $file_path . '" -o "' . $file_path . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $return_value);
+
   // if it returns '0' the command is valid?
   if ($return_value == '0') {
-    return $file . $file_suffix;
+    return $file_path . $file_suffix;
   }
   else {
     return FALSE;
@@ -133,21 +145,17 @@ function islandora_large_image_create_derivative_kakadu($file, $dsid, $file_ext)
  *
  * @TODO: could this be a generic function? eg: islandora_add_datastream($object, $dsid, $file). ?
  */
-function islandora_large_image_add_datastream($object, $dsid, $file) {
+function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype) {
   try {
     $ds = $object->constructDatastream($dsid, 'M');
     $ds->label = $dsid;
-    $ds->mimeType = $object['OBJ']->mimeType;
-    $ds->setContentFromFile(drupal_realpath($file->uri));
+    $ds->mimeType = $mimetype;
+    $ds->setContentFromFile($file);
     $object->ingestDatastream($ds);
-    file_delete($file);
   } catch (exception $e) {
     drupal_set_message(t('@message', array('@message' => check_plain($e->getMessage()))), 'error');
   }
 }
-
-
-
 
 
 

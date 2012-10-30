@@ -7,15 +7,17 @@ TODO:
 
 high
 
-- missing datastream keeps happening
 - evaluate current implementation
-- form ingest
 - make sure derivatives creation works
 - check for code reusablity
 -- remove variables in uninstall hook
 - documentation
 - add islandora_large_image.api.php
+- fix DS labels
+- make sure that file objects and loose files are removed.
 
 medium
+
+- write interface similar to imagemagick in drupal to configure kakadu.
 
 low
