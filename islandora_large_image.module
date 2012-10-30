@@ -18,6 +18,30 @@ function islandora_large_image_menu() {
 }
 
 /**
+ * Implements hook_theme().
+ *
+ * We supply a pattern so we can overide templates at the theme level if needed.
+ * we can append a pid to a template and the new template file will be called (the pids
+ * colon should be replaced with a dash)
+ * @return array
+ */
+function islandora_large_image_theme($existing, $type, $theme, $path) {
+  return array(
+    'islandora_large_image' => array(
+      'template' => 'theme/islandora-large-image',
+      'pattern' => 'islandora_large_image__', //we can add pids to the end of this pattern in our preprocess function
+      // and templates will be able to have have a pid appended to the template name to overide a template on a per object basis
+      //an example template would be named islandora-basic-image--islandora-27.tpl.phps
+      'variables' => array('islandora_object' => NULL),
+    ),
+    'islandora_large_image_viewers_table' => array(
+      'file' => 'admin/islandora_large_image.admin.inc',
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
  * Implements hook_islandora_required_objects().
  * @return type 
  */
@@ -69,7 +93,7 @@ function islandora_large_image_islandora_required_objects() {
               'label' => 'Collection policy',
               'mimetype' => 'text/xml',
               'control_group' => 'X',
-              'datastream_file' => "$module_path/xml/large_image_collection_policy.xml",
+              'datastream_file' => "$module_path/xml/islandora_large_image_collection_policy.xml",
             ),
           ),
         ),
@@ -79,25 +103,29 @@ function islandora_large_image_islandora_required_objects() {
 }
 
 /**
- * Implements hook_theme().
- *
- * We supply a pattern so we can overide templates at the theme level if needed.
- * we can append a pid to a template and the new template file will be called (the pids
- * colon should be replaced with a dash)
- * @return array
+ * Implements hook_islandora_xml_form_builder_forms().
  */
-function islandora_large_image_theme($existing, $type, $theme, $path) {
+function islandora_large_image_islandora_xml_form_builder_forms() {
+  $module_path = drupal_get_path('module', 'islandora_large_image');
   return array(
-    'islandora_large_image' => array(
-      'template' => 'theme/islandora-large-image',
-      'pattern' => 'islandora_large_image__', //we can add pids to the end of this pattern in our preprocess function
-      // and templates will be able to have have a pid appended to the template name to overide a template on a per object basis
-      //an example template would be named islandora-basic-image--islandora-27.tpl.phps
-      'variables' => array('islandora_object' => NULL),
+    'Large image MODS form' => array(
+      'form_file' => "$module_path/xml/islandora_large_image_form_mods.xml",
     ),
-    'islandora_large_image_viewers_table' => array(
-      'file' => 'admin/islandora_large_image.admin.inc',
-      'render element' => 'form',
+  );
+}
+
+/**
+ * Implements hook_islandora_content_model_forms_form_associations().
+ */
+function islandora_large_image_islandora_content_model_forms_form_associations() {
+  return array(
+    'islandora_large_image_mods_form' => array(
+      'content_model' => 'islandora:sp_large_image_cmodel',
+      'form_name' => 'Large image MODS form',
+      'dsid' => 'MODS',
+      'title_field' => "['titleInfo']['title']",
+      'transform' => 'mods_to_dc.xsl',
+      'template' => FALSE,
     ),
   );
 }
