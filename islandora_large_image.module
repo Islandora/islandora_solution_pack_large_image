@@ -237,12 +237,12 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
     $variables['islandora_medium_img'] = '<img src="' . $medium_size_url . '"/>';
   }
   // viewer
-  $viewer_id = _islandora_large_image_get_viewer_id();
+  $viewer_id = islandora_large_image_get_viewer_id();
   if ($viewer_id !== FALSE AND $viewer_id != 'none') {
     // get function callback
-    $viewer_callback = _islandora_large_image_get_viewer_callback($viewer_id);
+    $viewer_callback = islandora_large_image_get_viewer_callback($viewer_id);
     // get image url
-    $image_url = _islandora_large_image_get_viewer_url($islandora_object->id);
+    $image_url = islandora_large_image_get_viewer_url($islandora_object->id);
     // call viewer
     if ($viewer_callback !== FALSE) {
       $variables['islandora_viewer'] = $viewer_callback($image_url);      
@@ -253,7 +253,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
 /**
  * Get the url to be passed to the viewer.
  */
-function _islandora_large_image_get_viewer_url($object_id = NULL) {
+function islandora_large_image_get_viewer_url($object_id = NULL) {
   global $base_url;
   if ($object_id !== NULL) {
     // get viewer settings
@@ -272,7 +272,7 @@ function _islandora_large_image_get_viewer_url($object_id = NULL) {
 /**
  * Get id of the enabled viewer.
  */
-function _islandora_large_image_get_viewer_id() {
+function islandora_large_image_get_viewer_id() {
   $viewers_config = variable_get('islandora_large_image_viewers', array());
   if (!empty($viewers_config)) {
     return $viewers_config['default'];
@@ -283,7 +283,7 @@ function _islandora_large_image_get_viewer_id() {
 /**
  * Get callback function for a viewer.
  */
-function _islandora_large_image_get_viewer_callback($viewer_id = NULL) {
+function islandora_large_image_get_viewer_callback($viewer_id = NULL) {
   if ($viewer_id !== NULL) {
     // get defined viewers
     $viewers = module_invoke_all('islandora_large_image_get_viewer');

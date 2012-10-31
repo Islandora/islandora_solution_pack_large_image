@@ -25,7 +25,7 @@ function islandora_large_image_admin($form, &$form_state) {
   );
 
   // get viewers
-  $viewers = _islandora_large_image_get_viewers();
+  $viewers = islandora_large_image_get_viewers();
   // get viewer settings
   $viewers_config = variable_get('islandora_large_image_viewers', array());
   // viewer
@@ -105,7 +105,7 @@ function islandora_large_image_admin($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Reset to defaults'),
     '#weight' => 1,
-    '#submit' => array('_islandora_large_image_admin_submit'),
+    '#submit' => array('islandora_large_image_admin_submit'),
   );
 
   return system_settings_form($form);
@@ -121,7 +121,7 @@ function islandora_large_image_admin_validate($form, &$form_state) {
 /**
  * Form submit
  */
-function _islandora_large_image_admin_submit($form, &$form_state) {
+function islandora_large_image_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
   switch ($op) {
     case 'edit-reset':
@@ -183,7 +183,7 @@ function theme_islandora_large_image_viewers_table($variables) {
 /**
  * Helper function to return viewers. Adds a default option when at least one viewer plugin is found
  */
-function _islandora_large_image_get_viewers() {
+function islandora_large_image_get_viewers() {
   // get all viewer profiles
   $viewers = module_invoke_all('islandora_large_image_get_viewer');
   // if there's at least one viewer, add the default as an option too.
