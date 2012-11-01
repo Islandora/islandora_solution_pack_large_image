@@ -172,28 +172,23 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $variables['theme_hook_suggestions'][] = 'islandora_large_image__' . str_replace(':', '_', $islandora_object->id);
   $variables['parent_collections'] = islandora_datastream_get_parents($islandora_object);
 
-  // set OBJ
-  if (isset($islandora_object['OBJ'])) {
-    $full_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/OBJ/view';
-    $variables['islandora_full_url'] = $full_size_url;
-    $variables['islandora_full_img'] = '<img src="' . $full_size_url . '"/>';
-  }
   // set Thumbnail
   if (isset($islandora_object['TN'])) {
     $thumbnail_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/TN/view';
     $variables['islandora_thumbnail_img'] = '<img src="' . $thumbnail_size_url . '"/>';
   }
-  // set medium sized JPG
-  if (isset($islandora_object['JPG'])) {
-    $medium_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/JPG/view';
-    $variables['islandora_medium_img'] = '<img src="' . $medium_size_url . '"/>';
-  }
+  
   // viewer
   // include solution packs inc file
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   $viewer = islandora_get_viewer($islandora_object->id, 'JP2', 'islandora_large_image_viewers');
   if ($viewer) {
-    $variables['islandora_viewer'] = $viewer;
+    $variables['islandora_content'] = $viewer;
+  }
+  // set medium sized JPG
+  elseif (isset($islandora_object['JPG'])) {
+    $medium_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/JPG/view';
+    $variables['islandora_content'] = '<img src="' . $medium_size_url . '"/>';
   }
 }
 

@@ -15,17 +15,9 @@
 
 <div class="islandora-large-image-object islandora">
   <div class="islandora-large-image-content-wrapper clearfix">
-    <?php if (isset($islandora_medium_img)): ?>
-      <div class="islandora-large-image-content">
-      <?php if (isset($islandora_viewer)): ?>
-        <?php print $islandora_viewer; ?>
-      <?php elseif (isset($islandora_full_url)): ?>
-        <?php print l($islandora_medium_img, $islandora_full_url, array('html' => TRUE)); ?>
-      <?php elseif (isset($islandora_medium_img)): ?>
-        <?php print $islandora_medium_img; ?>
-      <?php endif; ?>
-      </div>
-    <?php endif; ?>
+    <div class="islandora-large-image-content">
+      <?php print $islandora_content; ?>
+    </div>
   <div class="islandora-large-image-sidebar">
     <?php if (isset($dc_array['dc:description']['value'])): ?>
       <h2><?php print $dc_array['dc:description']['label']; ?></h2>
