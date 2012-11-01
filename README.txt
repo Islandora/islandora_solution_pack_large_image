@@ -2,6 +2,9 @@ Large Image Solution Pack for Islandora
 Load all required Fedora objects, and creates empty collection object
 to accept tiff's and create deriviatives.
 
+Make sure your php settings allow for enough memory and upload size.
+(upload_max_filesize, post_max_size and memory_limit)
+
 TODO:
 =====
 

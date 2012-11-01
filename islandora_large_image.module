@@ -34,10 +34,6 @@ function islandora_large_image_theme($existing, $type, $theme, $path) {
       //an example template would be named islandora-basic-image--islandora-27.tpl.phps
       'variables' => array('islandora_object' => NULL),
     ),
-    'islandora_large_image_viewers_table' => array(
-      'file' => 'admin/islandora_large_image.admin.inc',
-      'render element' => 'form',
-    ),
   );
 }
 
@@ -193,61 +189,13 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
     $variables['islandora_medium_img'] = '<img src="' . $medium_size_url . '"/>';
   }
   // viewer
-  $viewer_id = islandora_large_image_get_viewer_id();
-  if ($viewer_id !== FALSE AND $viewer_id != 'none') {
-    // get function callback
-    $viewer_callback = islandora_large_image_get_viewer_callback($viewer_id);
-    // get image url
-    $image_url = islandora_large_image_get_viewer_url($islandora_object->id);
-    // call viewer
-    if ($viewer_callback !== FALSE) {
-      $variables['islandora_viewer'] = $viewer_callback($image_url);      
-    }
+  // include solution packs inc file
+  module_load_include('inc', 'islandora', 'includes/solution_packs');
+  $viewer = islandora_get_viewer($islandora_object->id, 'JP2', 'islandora_large_image_viewers');
+  if ($viewer) {
+    $variables['islandora_viewer'] = $viewer;
   }
 }
 
-/**
- * Get the url to be passed to the viewer.
- */
-function islandora_large_image_get_viewer_url($object_id = NULL) {
-  global $base_url;
-  if ($object_id !== NULL) {
-    // get viewer settings
-    $viewers_config = variable_get('islandora_large_image_viewers', array());
-    if (!empty($viewers_config) AND isset($viewers_config['default'])) {
-      $viewer = $viewers_config['default'];
-      $dsid = $viewers_config['dsid'][$viewer];
-      // create url
-      $url = $base_url . '/islandora/object/' . $object_id . '/datastream/' . $dsid . '/view';
-      return $url;
-    }
-  }
-  return FALSE;
-}
 
-/**
- * Get id of the enabled viewer.
- */
-function islandora_large_image_get_viewer_id() {
-  $viewers_config = variable_get('islandora_large_image_viewers', array());
-  if (!empty($viewers_config)) {
-    return $viewers_config['default'];
-  }
-  return FALSE;
-}
-
-/**
- * Get callback function for a viewer.
- */
-function islandora_large_image_get_viewer_callback($viewer_id = NULL) {
-  if ($viewer_id !== NULL) {
-    // get defined viewers
-    $viewers = module_invoke_all('islandora_large_image_get_viewer');
-    if (isset($viewers[$viewer_id]['callback'])) {
-      // return callback function
-      return $viewers[$viewer_id]['callback'];      
-    }
-  }
-  return FALSE;
-}
 
