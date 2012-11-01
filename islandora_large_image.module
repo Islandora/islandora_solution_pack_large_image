@@ -181,7 +181,8 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   // viewer
   // include solution packs inc file
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  $viewer = islandora_get_viewer($islandora_object->id, 'JP2', 'islandora_large_image_viewers');
+  $jp2_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/JP2/view';
+  $viewer = islandora_get_viewer($jp2_url, 'islandora_large_image_viewers');
   if ($viewer) {
     $variables['islandora_content'] = $viewer;
   }
