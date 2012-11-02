@@ -15,9 +15,11 @@
 
 <div class="islandora-large-image-object islandora">
   <div class="islandora-large-image-content-wrapper clearfix">
-    <div class="islandora-large-image-content">
-      <?php print $islandora_content; ?>
-    </div>
+    <?php if ($islandora_content): ?>
+      <div class="islandora-large-image-content">
+        <?php print $islandora_content; ?>
+      </div>
+    <?php endif; ?>
   <div class="islandora-large-image-sidebar">
     <?php if (isset($dc_array['dc:description']['value'])): ?>
       <h2><?php print $dc_array['dc:description']['label']; ?></h2>

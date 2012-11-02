@@ -191,6 +191,9 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
     $medium_size_url = $base_url . '/islandora/object/' . $islandora_object->id . '/datastream/JPG/view';
     $variables['islandora_content'] = '<img src="' . $medium_size_url . '"/>';
   }
+  else {
+    $variables['islandora_content'] = NULL;
+  }
 }
 
 
