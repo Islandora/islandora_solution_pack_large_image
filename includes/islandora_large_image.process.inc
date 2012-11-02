@@ -36,13 +36,6 @@ function islandora_large_image_create_all_derivatives($object) {
     islandora_large_image_add_datastream($object, 'JP2', $jp2_file, 'image/jp2');
   }
 
-/*
-  $tn_file = file_copy($original_file, 'temporary://' . $file_name . 'TN.' . $ext);
-  if (islandora_basic_image_create_derivative($tn_file, 200, 200)) {
-    islandora_basic_image_add_datastream($object, 'TN', $tn_file);
-  }
-*/
-
   // create thumbnail image and add as datastream
   islandora_large_image_create_derivative_imagemagick($original_file, $object, 'TN', 200, 200); // derive from jp2 image
   // create medium size image and add as datastream
