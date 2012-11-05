@@ -16,17 +16,11 @@ TODO:
 
 high
 
-- get drupal_set_title out of the template file !!
 - better error handling. -> imageMagick and kakadu error messages + watchdog.
-- use 'islandora_large_image' and append '_viewers' instead of 'islandora_large_image_viewers' ?
-- images in preprocess functions need alt attributes !
-- evaluate current implementation
 - check for code reusablity in derivatives
--- remove variables in uninstall hook
 - documentation
 - add islandora_large_image.api.php
 - fix DS labels?
-- make sure that file objects and loose files are removed.
 
 medium
 

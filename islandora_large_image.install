@@ -39,4 +39,12 @@ function islandora_large_image_uninstall() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   // uninstall callback
   islandora_install_solution_pack('islandora_large_image', 'uninstall');
+  // remove variables
+  $variables = array(
+    'islandora_large_image_use_for_default_tab',
+    'islandora_large_image_viewers',
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
 }

@@ -145,6 +145,7 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_ingest_
 }
 
 /**
+ * Implements hook_preprocess().
  *
  * @param array $variables
  *   an array of variables that will be passed to the theme function
@@ -168,16 +169,21 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $variables['islandora_object_label'] = $islandora_object->label;
   $variables['theme_hook_suggestions'][] = 'islandora_large_image__' . str_replace(':', '_', $islandora_object->id);
   $variables['parent_collections'] = islandora_datastream_get_parents($islandora_object);
+  // Set title
+  if (isset($islandora_object->label)) {
+    drupal_set_title($islandora_object->label);
+  }
+  // Thumbnail
   if (isset($islandora_object['TN'])) {
     $params = array(
       'title' => $islandora_object->label,
       'path' => url("islandora/object/{$islandora_object->id}/datastream/TN/view")
     );
-    $variables['islandora_thumbnail_img'] = theme_image($params);
+    $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
   // Display large image
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view");
+  $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view", array('absolute' => TRUE));
   $viewer = islandora_get_viewer($jp2_url, 'islandora_large_image_viewers');
   $variables['islandora_content'] = '';
   if ($viewer) {
@@ -188,7 +194,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
       'title' => $islandora_object->label,
       'path' => url("islandora/object/{$islandora_object->id}/datastream/JPG/view")
     );
-    $variables['islandora_content'] = theme_image($params);
+    $variables['islandora_content'] = theme('image', $params);
   }
   else {
     $variables['islandora_content'] = NULL;
