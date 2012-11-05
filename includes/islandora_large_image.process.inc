@@ -1,79 +1,37 @@
 <?php
+
 /**
  * @file
- * This file contains all the functions for image manipulation used in the
- * large image solution pack.
+ *
+ * This file contains all the functions for image manipulation used in the large image solution pack.
  */
 
 /**
- * creates the derivatives for this content model type
- * @param object $object
- *   tuque FedoraObject
- * @return string
+ * Creates the derivatives for this content model type
+ *
+ * @param FedoraObject $object
+ *   The object to add derivatives to.
  */
-function islandora_large_image_create_all_derivatives($object) {
-
-  // @TODO: this mimetype stuff is repeated in every solution pack. maybe make generic function?
-  module_load_include('inc', 'islandora', 'includes/mime.detect');
+function islandora_large_image_create_all_derivatives(FedoraObject $object) {
+  module_load_include('inc', 'islandora', 'includes/mime.detect'); // @TODO: this mimetype stuff is repeated in every solution pack. maybe make generic function?
   $mime_class = new MimeDetect();
-  
-  // OBJ is the original image
   if (!isset($object['OBJ'])) {
     drupal_set_message(t('Could not create image derivatives for %s.  No image file was uploaded.', array('%s' => $object->id)), 'error');
     return "";
   }
-  // find extention based on mimeType
-  $ext = $mime_class->getExtension($object['OBJ']->mimeType);
+  $ext = $mime_class->getExtension($object['OBJ']->mimeType); // Uploaded file's extension will be based on MIME type.
   $file_name = str_replace(':', '-', $object->id);
-  // the original file as a temp file
-  $original_file = file_save_data($object['OBJ']->content, 'temporary://' . $file_name . 'OBJ.' . $ext);
-
-
-  // convert from .tif to .jpeg2000
-  $jp2_file = file_copy($original_file, 'temporary://' . $file_name . 'JP2.jp2');
-  $jp2_file = islandora_large_image_create_derivative_kakadu($jp2_file, 'JP2', 'jp2');
+  $original_file = file_unmanaged_save_data($object['OBJ']->content, 'temporary://' . $file_name . 'OBJ.' . $ext);
+  $jp2_file = file_unmanaged_copy($original_file, 'temporary://' . $file_name . 'JP2.jp2');
+  $jp2_file = islandora_large_image_create_derivative_kakadu($jp2_file, 'JP2', 'jp2'); // Convert from .tif to .jpeg2000
   if ($jp2_file) {
     islandora_large_image_add_datastream($object, 'JP2', $jp2_file, 'image/jp2');
   }
-
-/*
-  $tn_file = file_copy($original_file, 'temporary://' . $file_name . 'TN.' . $ext);
-  if (islandora_basic_image_create_derivative($tn_file, 200, 200)) {
-    islandora_basic_image_add_datastream($object, 'TN', $tn_file);
-  }
-*/
-
-  // create thumbnail image and add as datastream
-  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'TN', 200, 200); // derive from jp2 image
-  // create medium size image and add as datastream
+  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'TN', 200, 200); // Create Thumbnail
   islandora_large_image_create_derivative_imagemagick($original_file, $object, 'JPG', 600, 800); // note: D6 does 500x700
   // @TODO: create EXIF
-
-  // remove temp file // @TODO: remove temp jp2 file too?
-  file_delete($original_file);
-}
-
-
-/**
- *
- * @param object $file
- *   stdclass
- *
- * @TODO: could this be a generic function? eg: islandora_create_derivative($file, $width, $height). ?
- * @TODO: remove. large image doesn't need this.
- */
-function islandora_large_image_create_derivative($file, $width, $height) {
-  // get file path
-  $real_path = drupal_realpath($file->uri);
-  // load file as image and scale
-  $image = image_load($real_path);
-  if (!empty($image)) {
-    $scale = image_scale($image, $width, $height, TRUE);
-    if ($scale) {
-      return image_save($image);
-    }
-  }
-  return FALSE;
+  file_unmanaged_delete($jp2_file);
+  file_unmanaged_delete($original_file);
 }
 
 /**
@@ -84,34 +42,27 @@ function islandora_large_image_create_derivative($file, $width, $height) {
  * @TODO: make reusable?
  */
 function islandora_large_image_create_derivative_imagemagick($original, $object, $dsid, $width, $height) {
-  $fid = $original->fid;
   $source = drupal_realpath($original->uri) . '[0]';
   $temp = drupal_tempnam('temporary://', $dsid);
   $dest = drupal_realpath($temp);
-
-  // set arguments
   $args['quality'] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
   $args['previewsize'] = '-resize ' . escapeshellarg("{$width}x{$height}");
-  // set context
   $context = array(
     'source' => $source,
     'destination' => $dest,
   );
-
-  // availablity to alter the arguments
   drupal_alter('imagemagick_arguments', $args, $context);
   // To make use of ImageMagick 6's parenthetical command grouping we need to make
   // the $source image the first parameter and $dest the last.
   // See http://www.imagemagick.org/Usage/basics/#cmdline
   $command = escapeshellarg($source) . ' ' . implode(' ', $args) . ' ' . escapeshellarg("jpg:$dest");
-
   if (_imagemagick_convert_exec($command, $output, $error) !== TRUE) {
     return FALSE;
   }
 
   islandora_large_image_add_datastream($object, $dsid, $dest, 'image/jpeg');
-//  file_unmanaged_delete($dest);
-/* file_delete($dest); */
+  //  file_unmanaged_delete($dest);
+  /* file_delete($dest); */
 }
 
 /**
@@ -139,6 +90,7 @@ function islandora_large_image_create_derivative_kakadu($file, $dsid, $file_ext)
 
 /**
  * adds a datastream and deletes the tmp file from local file system
+ *
  * @param object $object
  * @param string $dsid
  * @param object $file
@@ -156,6 +108,3 @@ function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype) 
     drupal_set_message(t('@message', array('@message' => check_plain($e->getMessage()))), 'error');
   }
 }
-
-
-

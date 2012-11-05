@@ -16,7 +16,7 @@ function islandora_large_image_requirements($phase) {
           'title' => 'Tuque',
           'description' => 'The Islandora Large Image solution pack requires the Tuque library.',
           'severity' => REQUIREMENT_ERROR,
-          ));
+        ));
     }
   }
 }
