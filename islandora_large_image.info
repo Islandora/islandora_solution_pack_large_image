@@ -1,6 +1,7 @@
 name = "Islandora large image"
 description = "A default Islandora module to handle large images"
 dependencies[] = islandora
+dependencies[] = imageapi
 dependencies[] = imagemagick
 package = Islandora
 version = 7.x-dev

@@ -2,6 +2,7 @@
 
 /**
  * @file
+ *
  * This file contains all admin functions
  */
 
@@ -30,8 +31,8 @@ function islandora_large_image_admin($form, &$form_state) {
   $viewer_table = islandora_viewers_form('islandora_large_image_viewers', 'image/jp2');
   // add viewer table
   $form += $viewer_table;
- 
-  
+
+
   // actions
   $form['actions'] = array(
     '#type' => 'actions'
@@ -62,8 +63,6 @@ function islandora_large_image_admin_submit($form, &$form_state) {
     case 'edit-reset':
       variable_del('islandora_large_image_use_for_default_tab');
       variable_del('islandora_large_image_viewers');
-    break;
+      break;
   }
 }
-
-
