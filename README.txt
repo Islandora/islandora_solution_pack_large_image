@@ -8,21 +8,24 @@ Make sure your php settings allow for enough memory and upload size.
 The large image solution pack is dependent on the imagemagick module. Make sure
 you have imagemagick enabled as the default image processor
 
+To succesfully create derivative datastreams ImageMagick (TN & JPG) and Kakadu (JP2) need to be installed on the server.
+
+
 TODO:
 =====
 
 high
 
 - get drupal_set_title out of the template file !!
-- use 'islandora_large_image' and append '_viewers' instead of 'islandora_large_image_viewers'
+- better error handling. -> imageMagick and kakadu error messages + watchdog.
+- use 'islandora_large_image' and append '_viewers' instead of 'islandora_large_image_viewers' ?
 - images in preprocess functions need alt attributes !
 - evaluate current implementation
-- make sure derivatives creation works
-- check for code reusablity
+- check for code reusablity in derivatives
 -- remove variables in uninstall hook
 - documentation
 - add islandora_large_image.api.php
-- fix DS labels
+- fix DS labels?
 - make sure that file objects and loose files are removed.
 
 medium
