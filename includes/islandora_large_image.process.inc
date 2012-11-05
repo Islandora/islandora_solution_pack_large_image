@@ -22,28 +22,43 @@ function islandora_large_image_create_all_derivatives(FedoraObject $object) {
   $ext = $mime_class->getExtension($object['OBJ']->mimeType); // Uploaded file's extension will be based on MIME type.
   $file_name = str_replace(':', '-', $object->id);
   $original_file = file_unmanaged_save_data($object['OBJ']->content, 'temporary://' . $file_name . 'OBJ.' . $ext);
+  // Create JP2
   $jp2_file = file_unmanaged_copy($original_file, 'temporary://' . $file_name . 'JP2.jp2');
   $jp2_file = islandora_large_image_create_derivative_kakadu($jp2_file, 'JP2', 'jp2'); // Convert from .tif to .jpeg2000
   if ($jp2_file) {
-    islandora_large_image_add_datastream($object, 'JP2', $jp2_file, 'image/jp2');
+    $label = t('JPEG 2000');
+    islandora_large_image_add_datastream($object, 'JP2', $jp2_file, 'image/jp2', $label);
   }
-
-  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'TN', 200, 200); // Create Thumbnail
-
-  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'JPG', 600, 800); // note: D6 does 500x700
-  // @TODO: create EXIF
+  // Create thumbnail
+  $label = t('Thumbnail');
+  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'TN', 200, 200, $label); // Create Thumbnail
+  // Create medium sized image
+  $label = t('Medium sized JPEG');
+  islandora_large_image_create_derivative_imagemagick($original_file, $object, 'JPG', 600, 800, $label); // note: D6 does 500x700
+  // remove temp files
   file_unmanaged_delete($jp2_file);
   file_unmanaged_delete($original_file);
 }
 
 /**
+ * Create a derivative image with ImageMagick.
  *
- * @param object $file
- *   stdclass
+ * @param string $original
+ *   Uri of the original image
+ * @param object $object
+ *   The object to add the datasteams to.
+ * @param string $dsid
+ *   Datastream ID for the derivative.
+ * @param string $width
+ *   Width for the derivative.
+ * @param string $height
+ *   Height for the derivative.
+ * @param string $label
+ *   Label for the derivative.
  *
  * @TODO: make reusable?
  */
-function islandora_large_image_create_derivative_imagemagick($original, $object, $dsid, $width, $height) {
+function islandora_large_image_create_derivative_imagemagick($original, $object, $dsid, $width, $height, $label) {
   $source = drupal_realpath($original->uri) . '[0]';
   $temp = drupal_tempnam('temporary://', $dsid);
   $dest = drupal_realpath($temp);
@@ -62,13 +77,24 @@ function islandora_large_image_create_derivative_imagemagick($original, $object,
     return FALSE;
   }
 
-  islandora_large_image_add_datastream($object, $dsid, $dest, 'image/jpeg');
-  //  file_unmanaged_delete($dest);
-  /* file_delete($dest); */
+  // add new file as a datastream
+  islandora_large_image_add_datastream($object, $dsid, $dest, 'image/jpeg', $label);
+  
+  // remove temp file
+  file_unmanaged_delete($dest);
 }
 
 /**
  * Creates a derivative with Kakadu.
+ *
+ * @param object $file
+ *   Drupal object around the original file.
+ * @param string $dsid
+ *   Datastream ID for the derivative.
+ * @param string $file_ext
+ *   File extention for the new file.
+ * @return
+ *   Returns the new generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_create_derivative_kakadu($file, $dsid, $file_ext) {
   // set variables
@@ -91,18 +117,25 @@ function islandora_large_image_create_derivative_kakadu($file, $dsid, $file_ext)
 }
 
 /**
- * adds a datastream and deletes the tmp file from local file system
+ * Adds a datastream to an object.
  *
  * @param object $object
+ *   The object to add a datastream to.
  * @param string $dsid
- * @param object $file
+ *   The datastream ID to be added.
+ * @param string $file
+ *   The URI of the file to be added.
+ * @param string $mimetype
+ *   The mimetype of the file.
+ * @param string $label
+ *   The label for the datastream.
  *
  * @TODO: could this be a generic function? eg: islandora_add_datastream($object, $dsid, $file). ?
  */
-function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype) {
+function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype, $label) {
   try {
     $ds = $object->constructDatastream($dsid, 'M');
-    $ds->label = $dsid;
+    $ds->label = $label;
     $ds->mimeType = $mimetype;
     $ds->setContentFromFile($file);
     $object->ingestDatastream($ds);

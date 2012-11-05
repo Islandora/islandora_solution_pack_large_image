@@ -19,7 +19,6 @@ high
 - better error handling. -> imageMagick and kakadu error messages + watchdog.
 - check for code reusablity in derivatives
 - documentation
-- add islandora_large_image.api.php
 - fix DS labels?
 
 medium
