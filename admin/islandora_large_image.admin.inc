@@ -14,24 +14,19 @@
 function islandora_large_image_admin($form, &$form_state) {
   // include css
   drupal_add_css(drupal_get_path('module', 'islandora_large_image') . '/css/islandora_large_image.admin.css');
-
-  $form = array();
-  $form['islandora_large_image_use_for_default_tab'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Provide the view for the default tab'),
-    '#default_value' => variable_get('islandora_large_image_use_for_default_tab', 1),
-    '#description' => t('Should this module provide the view for the default view tab.  If you are seeing unexpected content
-      on a view tab you may have multiple modules configured to provide content for the default tab.'),
-    '#weight' => -10
-  );
-
   // include solution packs inc file
   module_load_include('inc', 'islandora', 'includes/solution_packs');
+
+  $form = array();
+  // get default tab checkbox
+  $use_for_default_tab = islandora_use_for_default_tab_form('islandora_large_image_use_for_default_tab');
+  // add default tab checkbox
+  $form += $use_for_default_tab;
+
   // get viewer table
   $viewer_table = islandora_viewers_form('islandora_large_image_viewers', 'image/jp2');
   // add viewer table
   $form += $viewer_table;
-
 
   // actions
   $form['actions'] = array(

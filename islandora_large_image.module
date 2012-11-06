@@ -131,9 +131,11 @@ function islandora_large_image_islandora_content_model_forms_form_associations()
 /**
  * Implements hook_CMODEL_PID_islandora_view_object().
  */
-function islandora_large_image_islandora_sp_large_image_cmodel_islandora_view_object($object, $user, $page_number, $page_size) {
-  $output = theme('islandora_large_image', array('islandora_object' => $object));
-  return array('' => $output);
+function islandora_large_image_islandora_sp_large_image_cmodel_islandora_view_object($object, $page_number, $page_size) {
+  if (variable_get('islandora_large_image_use_for_default_tab', 1)) {
+    $output = theme('islandora_large_image', array('islandora_object' => $object));
+    return array('' => $output);
+  }
 }
 
 /**
