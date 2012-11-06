@@ -69,19 +69,18 @@ function islandora_large_image_create_derivative_imagemagick($original, $object,
     'destination' => $dest,
   );
   drupal_alter('imagemagick_arguments', $args, $context);
-  // To make use of ImageMagick 6's parenthetical command grouping we need to make
-  // the $source image the first parameter and $dest the last.
-  // See http://www.imagemagick.org/Usage/basics/#cmdline
+  /**
+   * To make use of ImageMagick 6's parenthetical command grouping we need to make the $source image the first parameter and $dest the last.
+   * See http://www.imagemagick.org/Usage/basics/#cmdline
+   */
   $command = escapeshellarg($source) . ' ' . implode(' ', $args) . ' ' . escapeshellarg("jpg:$dest");
   if (_imagemagick_convert_exec($command, $output, $error) !== TRUE) {
+    $message = t('Failed to create JPEG derivative Error: @error <br/> Command: @command <br/> Output @output', array('@error' => $error, '@command' => $command, '@output' => $error));
+    watchdog('islandora_large_image', $message, WATCHDOG_ERROR);
     return FALSE;
   }
-
-  // add new file as a datastream
   islandora_large_image_add_datastream($object, $dsid, $dest, 'image/jpeg', $label);
-  
-  // remove temp file
-  file_unmanaged_delete($dest);
+  file_unmanaged_delete($dest); // Only exists if successful
 }
 
 /**
@@ -93,18 +92,18 @@ function islandora_large_image_create_derivative_imagemagick($original, $object,
  *   Datastream ID for the derivative.
  * @param string $file_ext
  *   File extention for the new file.
+ *
  * @return
  *   Returns the new generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_create_derivative_kakadu($file, $dsid, $file_ext) {
-  // set variables
   $file_suffix = "_$dsid.$file_ext";
   $return_value = TRUE;
   $output = array();
 
   $file_path = drupal_realpath($file->uri);
 
-  // .tif to .jp2 file
+  // Convert .tif to .jp2 file
   exec('kdu_compress -i "' . $file_path . '" -o "' . $file_path . $file_suffix . '" -rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes', $output, $return_value);
 
   // if it returns '0' the command is valid?
