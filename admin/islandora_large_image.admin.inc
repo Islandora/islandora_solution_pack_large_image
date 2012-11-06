@@ -8,8 +8,6 @@
 
 /**
  * Admin form definition.
- *
- * @TODO: this seems to be used in every solution pack. Move to islandora core?
  */
 function islandora_large_image_admin($form, &$form_state) {
   // include css
@@ -18,11 +16,6 @@ function islandora_large_image_admin($form, &$form_state) {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
 
   $form = array();
-  // get default tab checkbox
-  $use_for_default_tab = islandora_use_for_default_tab_form('islandora_large_image_use_for_default_tab');
-  // add default tab checkbox
-  $form += $use_for_default_tab;
-
   // get viewer table
   $viewer_table = islandora_viewers_form('islandora_large_image_viewers', 'image/jp2');
   // add viewer table
@@ -56,7 +49,6 @@ function islandora_large_image_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
   switch ($op) {
     case 'edit-reset':
-      variable_del('islandora_large_image_use_for_default_tab');
       variable_del('islandora_large_image_viewers');
       break;
   }

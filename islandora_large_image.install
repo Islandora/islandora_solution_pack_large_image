@@ -41,7 +41,6 @@ function islandora_large_image_uninstall() {
   islandora_install_solution_pack('islandora_large_image', 'uninstall');
   // remove variables
   $variables = array(
-    'islandora_large_image_use_for_default_tab',
     'islandora_large_image_viewers',
   );
   foreach ($variables as $variable) {
