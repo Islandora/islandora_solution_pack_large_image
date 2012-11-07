@@ -1,12 +1,18 @@
 <?php
 
 /**
+ * @file
+ *
+ * Hooks and callbacks for this module.
+ */
+
+/**
  * Implements hook_menu().
  */
 function islandora_large_image_menu() {
   $items = array();
   $items['admin/islandora/large_image'] = array(  // @TODO: solution pack admin pages one nested deeper?
-    'title' => 'Large Image collection', // @TODO: should this just be named 'Large image'? are configuring the collection or the solution pack?
+    'title' => 'Large Image Collection', // @TODO: should this just be named 'Large image'? are configuring the collection or the solution pack?
     'description' => 'Configure the Large Image solution pack.',
     'page callback' => 'drupal_get_form',
     'access arguments' => array('administer site configuration'),
@@ -142,6 +148,20 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_view_ob
 function islandora_large_image_islandora_sp_large_image_cmodel_islandora_ingest_post_ingest($object) {
   module_load_include('inc', 'islandora_large_image', 'includes/islandora_large_image.process');
   islandora_large_image_create_all_derivatives($object);
+}
+
+/**
+ * Implements validation callback for the file upload field in the ingest form.
+ *
+ * Prevent's the upload of non TIFF image files.
+ */
+function islandora_large_image_ingest_form_validate_file(array $element, array &$form_state, $form) {
+  if ($_FILES['files']['error']['ingest-file-location'] != 0) {
+    form_error($element, t('This field is required.'));
+  }
+  elseif (!in_array($_FILES['files']['type']['ingest-file-location'], array('image/tiff', 'image/tif'))) {
+    form_error($element, t('This field only accepts tiff formated image files.'));
+  }
 }
 
 /**

@@ -36,13 +36,6 @@ function islandora_large_image_admin($form, &$form_state) {
 }
 
 /**
- * Form validate
- */
-function islandora_large_image_admin_validate($form, &$form_state) {
-
-}
-
-/**
  * Form submit
  */
 function islandora_large_image_admin_submit($form, &$form_state) {
