@@ -9,16 +9,30 @@
  * Implements hook_requirements().
  */
 function islandora_large_image_requirements($phase) {
+  $requirements = array();
   if ($phase == 'install') {
     module_load_include('inc', 'islandora', 'includes/tuque');
+    $t = get_t();
     if (!IslandoraTuque::exists()) {
-      return array(array(
-          'title' => 'Tuque',
-          'description' => 'The Islandora Large Image solution pack requires the Tuque library.',
-          'severity' => REQUIREMENT_ERROR,
-        ));
+      $requirements['tuque'] = array(
+        'title' => 'Tuque',
+        'description' => 'The Islandora Large Image solution pack requires the Tuque library.',
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    $out = array();
+    $ret = -1;
+    exec('command -v kdu_compress >/dev/null 2>&1', $out, $ret);
+    if ($ret != 0) {
+      $requirements['kakadu'] = array(
+        'title' => $t("Kakadu Image Compression"),
+        'value' => $t("Not installed"),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('Ensure that Adore-Djatoka is installed and kdu_compress is accessible to PHP.')
+      );
     }
   }
+  return $requirements;
 }
 
 /**
@@ -28,7 +42,6 @@ function islandora_large_image_requirements($phase) {
  */
 function islandora_large_image_install() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  // install solution pack object(s)
   islandora_install_solution_pack('islandora_large_image');
 }
 
@@ -37,9 +50,7 @@ function islandora_large_image_install() {
  */
 function islandora_large_image_uninstall() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  // uninstall callback
   islandora_install_solution_pack('islandora_large_image', 'uninstall');
-  // remove variables
   $variables = array(
     'islandora_large_image_viewers',
   );

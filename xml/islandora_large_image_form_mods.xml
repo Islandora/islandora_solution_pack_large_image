@@ -24,9 +24,12 @@
                 <properties>
                     <type>file</type>
                     <access>true</access>
-                    <description>Select image to upload.</description>
+                    <description>Select tiff image to upload.</description>
                     <required>false</required>
                     <tree>true</tree>
+		    <element_validate>
+		      <index key="0">islandora_large_image_ingest_form_validate_file</index>
+		    </element_validate>
                 </properties>
                 <children/>
             </element>
@@ -59,7 +62,7 @@
                             <type>textfield</type>
                             <access>true</access>
                             <description>Title of image.</description>
-                            <required>false</required>
+                            <required>true</required>
                             <title>Title</title>
                             <tree>true</tree>
                             <actions>
