@@ -43,7 +43,6 @@ function islandora_large_image_create_all_derivatives(FedoraObject $object) {
  *   The file path to the temp file if successful, FALSE otherwise.
  */
 function islandora_large_image_get_uploaded_file(FedoraObject $object, $base_name) {
-  module_load_include('inc', 'islandora', 'includes/mime.detect'); // @TODO: this mimetype stuff is repeated in every solution pack. maybe make generic function?
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($object['OBJ']->mimeType);
   return file_unmanaged_save_data($object['OBJ']->content, "temporary://{$base_name}_OBJ.{$ext}");
@@ -179,7 +178,6 @@ function islandora_large_image_imagemagick_convert($src, $dest, $width, $height)
    * See http://www.imagemagick.org/Usage/basics/#cmdline
    */
   $command = escapeshellarg($src) . ' ' . implode(' ', $args) . ' ' . escapeshellarg("jpg:$dest");
-  error_log($command);
   $output = '';
   $ret = -1;
   if (_imagemagick_convert_exec($command, $output, $ret) !== TRUE) {
