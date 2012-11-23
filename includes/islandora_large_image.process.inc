@@ -64,17 +64,22 @@ function islandora_large_image_get_uploaded_file(FedoraObject $object, $base_nam
  */
 function islandora_large_image_create_JP2_derivative(FedoraObject $object, $uploaded_file, $base_name) {
   // create JP2 with kakadu
-  // $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2"); // Create JP2
-  // create JP2 with ImageMagick - possibly make this switchable?
-  $args[] = " -define numrlvls=6";
-  $args[] = " -define jp2:tilewidth=1024";
-  $args[] = " -define jp2:tileheight=1024";
-  $args[] = " -define jp2:rate=1.0";
-  $args[] = " -define jp2:lazy";
-  $args[] = " -define jp2:prg=rlcp";
-  $args[] = " -define jp2:ilyrrates='0.015625,0.01858,0.0221,0.025,0.03125,0.03716,0.04419,0.05,0.0625, 0.075,0.088,0.1,0.125,0.15,0.18,0.21,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.84'";
-  $args[] = " -define jp2:mode=int";
-  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", $args);
+  $kakadu = variable_get('islandora_use_kakadu', FALSE);
+  $mime = strtolower($object['OBJ']->mimetype);
+  if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+    $kakadu = FALSE;
+  }
+
+  if ($kakadu) {
+    $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2"); // Create JP2
+    if (!$derivative_file) {
+      drupal_set_message(t("Kakadu failed.  Trying ImageMagick"));
+      $kakadu = FALSE; //forces retry with IMageMagick if Kakadu has failed - allows compressed tiffs if unsupported by Kakadu version
+    }
+  }
+  if (!$kakadu) {
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
+  }
   if ($derivative_file === FALSE) {
     drupal_set_message(t('Failed to create JP2 derivative'), 'error');
     return FALSE;
@@ -235,5 +240,36 @@ function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype, 
   return TRUE;
 }
 
+/**
+ * Return preconfigured paramaters for ImageMagick JP2 creation
+ * @return array
+ *
+ */
 
+function islandora_large_image_get_args() {
 
+  if (variable_get('islandora_lossless', FALSE)) {
+    $args[] = " -define numrlvls=6";
+    $args[] = " -define jp2:tilewidth=1024";
+    $args[] = " -define jp2:tileheight=1024";
+    $args[] = " -define jp2:rate=1.0";
+    $args[] = " -define jp2:lazy";
+    $args[] = " -define jp2:prg=rlcp";
+    $args[] = " -define jp2:ilyrrates='0.015625,0.01858,0.0221,0.025,0.03125,0.03716,0.04419,0.05,0.0625, 0.075,0.088,0.1,0.125,0.15,0.18,0.21,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.84'";
+    $args[] = " -define jp2:mode=int";
+  }
+  else {
+    $args[] = "-define numrlvls=7";
+    $args[] = "-define jp2:tilewidth=1024";
+    $args[] = "-define jp2:tileheight=1024";
+    $args[] = "-define jp2:rate=0.02348";
+    $args[] = "-define jp2:prg=rpcl";
+    $args[] = "-define jp2:mode=int";
+    $args[] = "-define jp2:prcwidth=16383";
+    $args[] = "-define jp2:prcheight=16383";
+    $args[] = "-define jp2:cblkwidth=64";
+    $args[] = "-define jp2:cblkheight=64";
+    $args[] = "-define jp2:sop";
+  }
+  return $args;
+}
