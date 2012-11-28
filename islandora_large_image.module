@@ -162,6 +162,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $islandora_object = $variables['islandora_object'];
   $repository = $islandora_object->repository;
   module_load_include('inc', 'islandora', 'includes/datastream');
+  module_load_include('inc', 'islandora', 'includes/utilities');
   // Get DC metadata
   try {
     $dc = $islandora_object['DC']->content;
