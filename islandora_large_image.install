@@ -11,17 +11,9 @@
 function islandora_large_image_requirements($phase) {
   $requirements = array();
   if ($phase == 'install') {
-    module_load_include('inc', 'islandora', 'includes/tuque');
     $t = get_t();
-    if (!IslandoraTuque::exists()) {
-      $requirements['tuque'] = array(
-        'title' => 'Tuque',
-        'description' => 'The Islandora Large Image solution pack requires the Tuque library.',
-        'severity' => REQUIREMENT_ERROR,
-      );
-    }
     $out = array();
-    $ret = -1;
+    $ret = 1;
     exec('command -v kdu_compress >/dev/null 2>&1', $out, $ret);
     if ($ret != 0) {
       $requirements['kakadu'] = array(
@@ -51,10 +43,6 @@ function islandora_large_image_install() {
 function islandora_large_image_uninstall() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   islandora_install_solution_pack('islandora_large_image', 'uninstall');
-  $variables = array(
-    'islandora_large_image_viewers',
-  );
-  foreach ($variables as $variable) {
-    variable_del($variable);
-  }
+  $variables = array('islandora_large_image_viewers');
+  array_walk($variables, 'variable_del');
 }

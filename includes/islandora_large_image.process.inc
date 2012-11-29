@@ -43,7 +43,6 @@ function islandora_large_image_create_all_derivatives(FedoraObject $object) {
  *   The file path to the temp file if successful, FALSE otherwise.
  */
 function islandora_large_image_get_uploaded_file(FedoraObject $object, $base_name) {
-  module_load_include('inc', 'islandora', 'includes/mime.detect'); // @TODO: this mimetype stuff is repeated in every solution pack. maybe make generic function?
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($object['OBJ']->mimeType);
   return file_unmanaged_save_data($object['OBJ']->content, "temporary://{$base_name}_OBJ.{$ext}");
@@ -63,7 +62,23 @@ function islandora_large_image_get_uploaded_file(FedoraObject $object, $base_nam
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_JP2_derivative(FedoraObject $object, $uploaded_file, $base_name) {
-  $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2"); // Create JP2
+  // create JP2 with kakadu
+  $kakadu = variable_get('islandora_use_kakadu', FALSE);
+  $mime = strtolower($object['OBJ']->mimetype);
+  if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+    $kakadu = FALSE;
+  }
+
+  if ($kakadu) {
+    $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2"); // Create JP2
+    if (!$derivative_file) {
+      drupal_set_message(t("Kakadu failed.  Trying ImageMagick"));
+      $kakadu = FALSE; //forces retry with IMageMagick if Kakadu has failed - allows compressed tiffs if unsupported by Kakadu version
+    }
+  }
+  if (!$kakadu) {
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
+  }
   if ($derivative_file === FALSE) {
     drupal_set_message(t('Failed to create JP2 derivative'), 'error');
     return FALSE;
@@ -86,7 +101,10 @@ function islandora_large_image_create_JP2_derivative(FedoraObject $object, $uplo
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_JPG_derivative(FedoraObject $object, $uploaded_file, $base_name) {
-  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", 600, 800);
+  $args = array();
+  $args[] = '-resize ' . escapeshellarg("600 x 800}");
+  $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
+  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
   if ($derivative_file === FALSE) {
     drupal_set_message(t('Failed to create JPG derivative'), 'error');
     return FALSE;
@@ -109,7 +127,10 @@ function islandora_large_image_create_JPG_derivative(FedoraObject $object, $uplo
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_TN_derivative(FedoraObject $object, $uploaded_file, $base_name) {
-  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", 200, 200);
+  $args = array();
+  $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
+  $args[] = '-resize ' . escapeshellarg("200 x 200");
+  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
   if ($derivative_file === FALSE) {
     drupal_set_message(t('Failed to create TN derivative'), 'error');
     return FALSE;
@@ -148,7 +169,6 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   return $dest;
 }
 
-
 /**
  * Calls imagemagick's convert command with the given arguments.
  *
@@ -164,11 +184,9 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
  * @return string
  *   The destination file path if successful otherwise FALSE.
  */
-function islandora_large_image_imagemagick_convert($src, $dest, $width, $height) {
+function islandora_large_image_imagemagick_convert($src, $dest, $args) {
   $src = drupal_realpath($src) . '[0]';
   $dest = drupal_realpath($dest);
-  $args['quality'] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-  $args['previewsize'] = '-resize ' . escapeshellarg("{$width}x{$height}");
   $context = array(
     'source' => $src,
     'destination' => $dest,
@@ -179,7 +197,6 @@ function islandora_large_image_imagemagick_convert($src, $dest, $width, $height)
    * See http://www.imagemagick.org/Usage/basics/#cmdline
    */
   $command = escapeshellarg($src) . ' ' . implode(' ', $args) . ' ' . escapeshellarg("jpg:$dest");
-  error_log($command);
   $output = '';
   $ret = -1;
   if (_imagemagick_convert_exec($command, $output, $ret) !== TRUE) {
@@ -219,4 +236,38 @@ function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype, 
     return FALSE;
   }
   return TRUE;
+}
+
+/**
+ * Return preconfigured paramaters for ImageMagick JP2 creation
+ * @return array
+ *
+ */
+
+function islandora_large_image_get_args() {
+
+  if (variable_get('islandora_lossless', FALSE)) {
+    $args[] = " -define numrlvls=6";
+    $args[] = " -define jp2:tilewidth=1024";
+    $args[] = " -define jp2:tileheight=1024";
+    $args[] = " -define jp2:rate=1.0";
+    $args[] = " -define jp2:lazy";
+    $args[] = " -define jp2:prg=rlcp";
+    $args[] = " -define jp2:ilyrrates='0.015625,0.01858,0.0221,0.025,0.03125,0.03716,0.04419,0.05,0.0625, 0.075,0.088,0.1,0.125,0.15,0.18,0.21,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.84'";
+    $args[] = " -define jp2:mode=int";
+  }
+  else {
+    $args[] = "-define numrlvls=7";
+    $args[] = "-define jp2:tilewidth=1024";
+    $args[] = "-define jp2:tileheight=1024";
+    $args[] = "-define jp2:rate=0.02348";
+    $args[] = "-define jp2:prg=rpcl";
+    $args[] = "-define jp2:mode=int";
+    $args[] = "-define jp2:prcwidth=16383";
+    $args[] = "-define jp2:prcheight=16383";
+    $args[] = "-define jp2:cblkwidth=64";
+    $args[] = "-define jp2:cblkheight=64";
+    $args[] = "-define jp2:sop";
+  }
+  return $args;
 }
