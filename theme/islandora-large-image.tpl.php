@@ -7,7 +7,7 @@
  * Available variables:
  * - $islandora_object: The Islandora object rendered in this template file
  * - $islandora_dublin_core: The DC datastream object
- * - $dc_array: The DC datastream object values as a sanitized array. This 
+ * - $dc_array: The DC datastream object values as a sanitized array. This
  *   includes label, value and class name.
  * - $islandora_object_label: The sanitized object label.
  * - $parent_collections: An array containing parent collection(s) info.
@@ -38,8 +38,8 @@
       <div>
         <h2><?php print t('In collections'); ?></h2>
         <ul>
-          <?php foreach ($parent_collections as $key => $value): ?>
-            <li><?php print $value['label_link'] ?></li>
+          <?php foreach ($parent_collections as $collection): ?>
+        <li><?php print l($collection->label, "islandora/object/{$collection->id}"); ?></li>
           <?php endforeach; ?>
         </ul>
       </div>
