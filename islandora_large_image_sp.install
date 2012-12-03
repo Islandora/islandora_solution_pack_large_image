@@ -29,13 +29,13 @@ function islandora_large_image_sp_enable() {
         $batch['operations'][] = array('fedora_repository_batch_reingest_object', array($object));
       }
     }
-
+    
     // If there's any operations to perform
     if (count($batch['operations'])) {
-
+  
       // Add the batch to be processed
       batch_set($batch);
-
+      
       // Start processing, if required
       if (!batch_get()) {
         batch_process();
