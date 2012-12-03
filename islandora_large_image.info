@@ -1,0 +1,10 @@
+name = "Islandora large image"
+description = "A default Islandora module to handle large images"
+dependencies[] = islandora
+dependencies[] = imagemagick
+package = Islandora
+version = 7.x-dev
+core = 7.x
+configure = admin/islandora/large_image
+stylesheets[all][] = css/islandora_large_image.base.css
+stylesheets[all][] = css/islandora_large_image.theme.css
