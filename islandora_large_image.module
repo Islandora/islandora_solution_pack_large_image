@@ -210,9 +210,9 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
 /**
  * Implements hook_islandora_ingest_steps().
  */
-function islandora_large_image_islandora_sp_large_image_cmodel_islandora_ingest_steps(array $configuration) {
+function islandora_large_image_islandora_sp_large_image_cmodel_islandora_ingest_steps() {
   return array(
-    array(
+    'islandora_large_image_upload' => array(
       'weight' => 10,
       'type' => 'form',
       'form_id' => 'islandora_large_image_image_upload_form',
