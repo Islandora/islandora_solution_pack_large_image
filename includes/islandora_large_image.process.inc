@@ -102,7 +102,7 @@ function islandora_large_image_create_JP2_derivative(FedoraObject $object, $uplo
  */
 function islandora_large_image_create_JPG_derivative(FedoraObject $object, $uploaded_file, $base_name) {
   $args = array();
-  $args[] = '-resize ' . escapeshellarg("600 x 800}");
+  $args[] = '-resize ' . escapeshellarg("600 x 800");
   $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
   $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
   if ($derivative_file === FALSE) {
