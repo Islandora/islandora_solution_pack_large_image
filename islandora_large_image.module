@@ -52,57 +52,51 @@ function islandora_large_image_theme($existing, $type, $theme, $path) {
  *
  * @return type
  */
-function islandora_large_image_islandora_required_objects() {
+function islandora_large_image_islandora_required_objects(IslandoraTuque $connection) {
   $module_path = drupal_get_path('module', 'islandora_large_image');
+  // Large Image Content Model
+  $large_image_content_model = $connection->repository->constructObject('islandora:sp_large_image_cmodel');
+  $large_image_content_model->owner = 'fedoraAdmin';
+  $large_image_content_model->label = 'Islandora Large Image Content Model';
+  $large_image_content_model->models = 'fedora-system:ContentModel-3.0';
+  // ISLANDORACM Datastream
+  $datastream = $large_image_content_model->constructDatastream('ISLANDORACM', 'X');
+  $datastream->label = 'Islandora content model';
+  $datastream->mimetype = 'text/xml';
+  $datastream->setContentFromFile("$module_path/xml/islandora_sp_large_image_cmodel.xml", FALSE);
+  $large_image_content_model->ingestDatastream($datastream);
+  // DS-COMPOSITE-MODEL Datastream
+  $datastream = $large_image_content_model->constructDatastream('DS-COMPOSITE-MODEL', 'X');
+  $datastream->label = 'DS-COMPOSITE-MODEL';
+  $datastream->mimetype = 'text/xml';
+  $datastream->setContentFromFile("$module_path/xml/islandora_large_image_ds_composite_model.xml", FALSE);
+  $large_image_content_model->ingestDatastream($datastream);
+  // Large Image Collection
+  $large_image_collection = $connection->repository->constructObject('islandora:sp_large_image_collection');
+  $large_image_collection->owner = 'fedoraAdmin';
+  $large_image_collection->label = 'Large Image Collection';
+  $large_image_collection->models = 'islandora:collectionCModel';
+  $large_image_collection->relationships->add(FEDORA_RELS_EXT_URI, 'isMemberOfCollection', 'islandora:root');
+  // Collection Policy Datastream
+  $datastream = $large_image_collection->constructDatastream('COLLECTION_POLICY', 'X');
+  $datastream->label = 'Collection policy';
+  $datastream->mimetype = 'text/xml';
+  $datastream->setContentFromFile("$module_path/xml/islandora_large_image_collection_policy.xml", FALSE);
+  $large_image_collection->ingestDatastream($datastream);
+  // TN Datastream
+  $datastream = $large_image_collection->constructDatastream('TN', 'M');
+  $datastream->label = 'Thumbnail';
+  $datastream->mimetype = 'image/png';
+  $datastream->setContentFromFile("$module_path/images/folder.png", FALSE);
+  $large_image_collection->ingestDatastream($datastream);
   return array(
     'islandora_large_image' => array(
       'title' => 'Islandora large image',
       'objects' => array(
-        array(
-          'pid' => 'islandora:sp_large_image_cmodel',
-          'label' => 'Islandora large image content model',
-          'cmodel' => 'fedora-system:ContentModel-3.0',
-          'datastreams' => array(
-            array(
-              'dsid' => 'ISLANDORACM',
-              'label' => 'Islandora content model',
-              'mimetype' => 'text/xml',
-              'control_group' => 'X',
-              'datastream_file' => "$module_path/xml/islandora_sp_large_image_cmodel.xml",
-            ),
-            array(
-              'dsid' => 'DS-COMPOSITE-MODEL',
-              'label' => 'DS-COMPOSITE-MODEL',
-              'mimetype' => 'text/xml',
-              'control_group' => 'X',
-              'datastream_file' => "$module_path/xml/islandora_large_image_ds_composite_model.xml",
-            ),
-          ),
-        ),
-        array(
-          'pid' => 'islandora:sp_large_image_collection',
-          'label' => 'Large image collection',
-          'cmodel' => 'islandora:collectionCModel',
-          'parent' => 'islandora:root',
-          'datastreams' => array(
-            array(
-              'dsid' => 'TN',
-              'label' => 'Thumbnail',
-              'mimetype' => 'image/png',
-              'control_group' => 'M',
-              'datastream_file' => "$module_path/images/folder.png",
-            ),
-            array(
-              'dsid' => 'COLLECTION_POLICY',
-              'label' => 'Collection policy',
-              'mimetype' => 'text/xml',
-              'control_group' => 'X',
-              'datastream_file' => "$module_path/xml/islandora_large_image_collection_policy.xml",
-            ),
-          ),
-        ),
-      ),
-    ),
+        $large_image_content_model,
+        $large_image_collection,
+      )
+    )
   );
 }
 
@@ -188,7 +182,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  
+
   // Get token to allow access to XACML protected datastreams if necessary.
   if (isset($islandora_object['POLICY'])) {
     module_load_include('inc', 'islandora', 'includes/islandora_authtokens');
@@ -202,7 +196,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   else {
     $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view", array('absolute' => TRUE));
   }
-  
+
   // Display large image
   $viewer = islandora_get_viewer($jp2_url, 'islandora_large_image_viewers');
   $variables['islandora_content'] = '';
