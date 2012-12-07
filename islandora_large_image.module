@@ -187,9 +187,23 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
     );
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
-  // Display large image
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view", array('absolute' => TRUE));
+  
+  // Get token to allow access to XACML protected datastreams if necessary.
+  if (isset($islandora_object['POLICY'])) {
+    module_load_include('inc', 'islandora', 'includes/islandora_authtokens');
+    $token = islandora_get_object_token($islandora_object->id, 'JP2', 2);
+    $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view",
+      array(
+        'absolute' => TRUE,
+        'query' => array('token'=>$token),
+      ));
+  }
+  else {
+    $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view", array('absolute' => TRUE));
+  }
+  
+  // Display large image
   $viewer = islandora_get_viewer($jp2_url, 'islandora_large_image_viewers');
   $variables['islandora_content'] = '';
   if ($viewer) {
