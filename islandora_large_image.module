@@ -157,7 +157,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $repository = $islandora_object->repository;
   module_load_include('inc', 'islandora', 'includes/datastream');
   module_load_include('inc', 'islandora', 'includes/utilities');
-  // Get DC metadata
+  // Get DC metadata.
   try {
     $dc = $islandora_object['DC']->content;
     $dc_object = DublinCore::import_from_xml_string($dc);
@@ -169,33 +169,29 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $variables['islandora_object_label'] = $islandora_object->label;
   $variables['theme_hook_suggestions'][] = 'islandora_large_image__' . str_replace(':', '_', $islandora_object->id);
   $variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
-  // Set title
+  // Set title.
   if (isset($islandora_object->label)) {
     drupal_set_title($islandora_object->label);
   }
-  // Thumbnail
+  // Thumbnail.
   if (isset($islandora_object['TN'])) {
     $params = array(
       'title' => $islandora_object->label,
-      'path' => url("islandora/object/{$islandora_object->id}/datastream/TN/view")
+      'path' => url("islandora/object/{$islandora_object->id}/datastream/TN/view"),
     );
     $variables['islandora_thumbnail_img'] = theme('image', $params);
   }
   module_load_include('inc', 'islandora', 'includes/solution_packs');
 
-  // Get token to allow access to XACML protected datastreams if necessary.
-  if (isset($islandora_object['POLICY'])) {
-    module_load_include('inc', 'islandora', 'includes/islandora_authtokens');
-    $token = islandora_get_object_token($islandora_object->id, 'JP2', 2);
-    $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view",
-      array(
-        'absolute' => TRUE,
-        'query' => array('token'=>$token),
-      ));
-  }
-  else {
-    $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view", array('absolute' => TRUE));
-  }
+  // Get token to allow access to XACML protected datastreams.
+  // Always use token authentication in case there is a global policy.
+  module_load_include('inc', 'islandora', 'includes/islandora_authtokens');
+  $token = islandora_get_object_token($islandora_object->id, 'JP2', 2);
+  $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view",
+    array(
+      'absolute' => TRUE,
+      'query' => array('token' => $token),
+    ));
 
   // Display large image
   $viewer = islandora_get_viewer($jp2_url, 'islandora_large_image_viewers');
