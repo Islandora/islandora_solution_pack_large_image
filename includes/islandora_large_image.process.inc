@@ -45,7 +45,9 @@ function islandora_large_image_create_all_derivatives(FedoraObject $object) {
 function islandora_large_image_get_uploaded_file(FedoraObject $object, $base_name) {
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($object['OBJ']->mimeType);
-  return file_unmanaged_save_data($object['OBJ']->content, "temporary://{$base_name}_OBJ.{$ext}");
+  $filename = file_create_filename("{$base_name}_OBJ.{$ext}", 'temporary://');
+  $object['OBJ']->getContent($filename);
+  return $filename;
 }
 
 /**
