@@ -214,7 +214,7 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
 /**
  * Adds a datastream to an object.
  *
- magemagick_convert_exec($command, $output,* @param object $object
+ *magemagick_convert_exec($command, $output, @param object $object
  *   The object to add a datastream to.
  * @param string $dsid
  *   The datastream ID to be added.
