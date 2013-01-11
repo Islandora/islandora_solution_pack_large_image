@@ -187,7 +187,7 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
  *   The destination file path if successful otherwise FALSE.
  */
 function islandora_large_image_imagemagick_convert($src, $dest, $args) {
-  $src = drupal_realpath($src) . '[0]';
+  $src = drupal_realpath($src);
   $dest = drupal_realpath($dest);
   $context = array(
     'source' => $src,
@@ -198,7 +198,7 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
    * To make use of ImageMagick 6's parenthetical command grouping we need to make the $source image the first parameter and $dest the last.
    * See http://www.imagemagick.org/Usage/basics/#cmdline
    */
-  $command = escapeshellarg($src) . ' ' . implode(' ', $args) . ' ' . escapeshellarg("jpg:$dest");
+  $command = escapeshellarg($src) . ' ' . implode(' ', $args) . ' ' . escapeshellarg("jpg:$dest");	
   $output = '';
   $ret = -1;
   if (_imagemagick_convert_exec($command, $output, $ret) !== TRUE) {
@@ -207,13 +207,14 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
     watchdog('islandora_large_image', $message, $variables, WATCHDOG_ERROR);
     return FALSE;
   }
+
   return $dest;
 }
 
 /**
  * Adds a datastream to an object.
  *
- * @param object $object
+ magemagick_convert_exec($command, $output,* @param object $object
  *   The object to add a datastream to.
  * @param string $dsid
  *   The datastream ID to be added.
