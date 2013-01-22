@@ -142,7 +142,7 @@ class ShowLargeImagesInFieldSets {
       '#title' => t('View'),
       // This will be the content of the tab.
       '#content' => '<img src="' . $base_url .
-      '/fedora/' . $this->pid . '/JPG/JPG.jpg' . '" />' . '<p>' . drupal_get_form('fedora_repository_image_tagging_form', $this->pid) . '</p>',
+      '/fedora/' . $this->pid . '/JPG/JPG.jpg' . '" />' ,
     );
     return $tabset;
   }
