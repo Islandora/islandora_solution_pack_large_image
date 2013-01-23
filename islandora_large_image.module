@@ -186,7 +186,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   // Get token to allow access to XACML protected datastreams.
   // Always use token authentication in case there is a global policy.
   module_load_include('inc', 'islandora', 'includes/islandora_authtokens');
-  $token = islandora_get_object_token($islandora_object->id, 'JP2', 1);
+  $token = islandora_get_object_token($islandora_object->id, 'JP2', 2);
   $jp2_url = url("islandora/object/{$islandora_object->id}/datastream/JP2/view",
     array(
       'absolute' => TRUE,
