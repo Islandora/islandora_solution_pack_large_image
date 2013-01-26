@@ -65,7 +65,8 @@ function islandora_large_image_get_uploaded_file(FedoraObject $object, $base_nam
  */
 function islandora_large_image_create_JP2_derivative(FedoraObject $object, $uploaded_file, $base_name) {
   // create JP2 with kakadu
-  $kakadu = variable_get('islandora_use_kakadu', FALSE);
+  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
+  $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
   $mime = strtolower($object['OBJ']->mimetype);
   if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
     $kakadu = FALSE;
@@ -155,12 +156,34 @@ function islandora_large_image_create_TN_derivative(FedoraObject $object, $uploa
  *   Returns the newly generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
+  // Kinda weird logic, to avoid changing the source.
+  $unlink_source = FALSE;
+
+  // First, convert to (potentially uncompressed) TIFF file.
+  if (!islandora_large_image_is_uncompressed_tiff($src)) {
+    $c_args = array();
+
+    // If the source is not a TIFF, or we have been instructed to uncompress
+    //   TIFFs, make it so.
+    if (!islandora_large_image_is_tiff($src) ||
+      variable_get('islandora_large_image_uncompress_tiff', TRUE)) {
+      $c_args[] = "-compress None";
+    }
+
+    $c_dest = file_create_filename(drupal_basename($src) . ".tif", 'temporary://');
+
+    $src = islandora_large_image_imagemagick_convert($src, $c_dest, $c_args);
+
+    $unlink_source = TRUE;
+  }
+
   $args = isset($args) ? $args : '-rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes'; // Default args.
   $src = drupal_realpath($src);
   $dest = drupal_realpath($dest);
   $ret = -1;
   $output = array();
-  $command = "kdu_compress -i \"$src\" -o \"$dest\" $args 2>&1";
+  $kdu_compress = variable_get('islandora_kakadu_url', 'kdu_compress');
+  $command = "$kdu_compress -i \"$src\" -o \"$dest\" $args 2>&1";
   exec($command, $output, $ret);
   if ($ret != 0) {
     $message = 'kdu_compress failed to create derivative<br/>Error: @ret<br/>Command: @command <br/>Output !output';
@@ -168,6 +191,11 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
     watchdog('islandora_large_image', $message, $variables, WATCHDOG_ERROR);
     return FALSE;
   }
+
+  if ($unlink_source) {
+    unlink($src);
+  }
+
   return $dest;
 }
 
@@ -245,7 +273,6 @@ function islandora_large_image_add_datastream($object, $dsid, $file, $mimetype, 
  * @return array
  *
  */
-
 function islandora_large_image_get_args() {
 
   if (variable_get('islandora_lossless', FALSE)) {
@@ -273,3 +300,66 @@ function islandora_large_image_get_args() {
   }
   return $args;
 }
+
+/**
+ * Uses Imagemagick's identify to examine the file in question.
+ *
+ * @param string $file
+ *   A file-system path to the file in question.
+ *
+ * @return boolean
+ *   A boolean indicating if the file contains a TIFF which is not compressed,
+ *   (if it could be reencoded by the "free" version of Kakadu.
+ */
+function islandora_large_image_is_uncompressed_tiff($file) {
+  $identify = islandora_large_image_get_identify();
+
+  $file = drupal_realpath($file);
+
+  $compression = exec(escapeshellcmd("$identify -format \"%C\" $file"));
+
+  $compressed = (strtolower($compression) != 'none');
+
+  return !$compressed && islandora_large_image_is_tiff($file);
+}
+
+/**
+ * Uses Imagemagick's identify to determine if the file is a TIFF.
+ *
+ * @param string $file
+ *   A file-system path to the file in question.
+ *
+ * @return boolean
+ *   A boolean indicating if the file contains a TIFF.
+ */
+function islandora_large_image_is_tiff($file) {
+  $identify = islandora_large_image_get_identify();
+
+  $file = drupal_realpath($file);
+
+  $codec = exec(escapeshellcmd("$identify -format \"%m\" $file"));
+
+  $is_tiff = (strtolower($codec) == 'tiff');
+
+  return $is_tiff;
+}
+
+/**
+ * Attempt to get the "identify" executable...
+ *
+ * Assume convert is sanely named, and that identify can be obtained from the
+ * same place.
+ *
+ * @return string
+ *   The command to run for "identify".
+ */
+function islandora_large_image_get_identify() {
+  // Get path for convert
+  $convert = variable_get('imagemagick_convert', 'convert');
+
+  // Replace "convert" with "identify"
+  $identify = str_replace('convert', 'identify', $convert);
+
+  return $identify;
+}
+
