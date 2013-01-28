@@ -22,7 +22,10 @@ function islandora_large_image_admin($form, &$form_state) {
 
   $lossless = variable_get('islandora_lossless', FALSE);
 
-  $kakadu_checked = isset($form_state['values']['islandora_use_kakadu']) ? $form_state['values']['islandora_use_kakadu'] : variable_get('islandora_use_kakadu', FALSE);
+  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
+  $im_jp2000 = islandora_large_image_check_imagemagick_for_jpeg2000();
+
+  $kakadu_checked = isset($form_state['values']['islandora_use_kakadu']) ? $form_state['values']['islandora_use_kakadu'] : variable_get('islandora_use_kakadu', $im_jp2000);
   $kakadu_view = $kakadu_checked ? 'markup' : 'hidden';
 
 
@@ -33,7 +36,7 @@ function islandora_large_image_admin($form, &$form_state) {
     $confirmation_message = '<img src="' . url('misc/watchdog-error.png') . '"/> '
         . t('Unable to find kakadu executable at !kakadu_url', array('!kakadu_url' => "<strong>$kakadu_url</strong>"));
   }
-  $form = array();
+
   $form['islandora_lossless'] = array(
     '#title' => t("Lossless Derivative Creation?"),
     '#default_value' => $lossless,
@@ -41,36 +44,41 @@ function islandora_large_image_admin($form, &$form_state) {
     '#type' => 'checkbox',
   );
 
+
   $form['islandora_use_kakadu'] = array(
+    '#prefix' => '<div id="islandora-use-kakadu-wrapper">',
+    '#suffix' => '</div>',
     '#title' => t("Use Kakadu for image compression?"),
-    '#default_value' => $kakadu_checked,
-    '#description' => t("!kakadu offers faster derivative creation than the standard ImageMagick package.", array('!kakadu' => l(t('kakadu'), 'http://www.kakadusoftware.com/'))),
+    '#disabled' => !$im_jp2000,
+    '#default_value' => $kakadu_checked || !$im_jp2000,
+    '#description' => t("!kakadu offers faster derivative creation than the standard ImageMagick package. %magick_info", array(
+      '!kakadu' => l(t('kakadu'), 'http://www.kakadusoftware.com/'),
+      '%magick_info' => $im_jp2000?
+        t('ImageMagick reports support of JPEG-2000s.'):
+        t('ImageMagick does not report support of JPEG-2000.'),
+    )),
     '#type' => 'checkbox',
-    '#ajax' => array(
-      'callback' => 'islandora_update_kakadu_url_div',
-      'wrapper' => 'islandora-url',
-      'effect' => 'fade',
-      'progress' => array('type' => 'throbber'),
+  );
+
+  $form['islandora_large_image_uncompress_tiff'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Uncompress TIFF files prior to creating JP2?'),
+    '#description' => t('The version of Kakadu shipped with Djatoka does not ' .
+      'support compressed TIFFs; therefore, it is likely desirable to ' .
+      'uncompress the TIFF so Kakadu does not encounter an error. This will ' .
+      'not change the original TIFF stored in the OBJ datastream. Only ' .
+      'disable if you are completely sure!'),
+    '#default_value' => variable_get('islandora_large_image_uncompress_tiff', TRUE),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="islandora_use_kakadu"]' => array('checked' => TRUE),
+      ),
     ),
   );
 
-  $forms['islandora_kakadu_url'] = array(
-    '#prefix' => '<div id = "kakadu_url">',
-    '#suffix' => '</div>',
-    '#type' => 'textfield',
-    '#description' => t("This module requires !kakadu to create derivative files", array('!kakadu' => l(t('kakadu'), 'http://www.kakadusoftware.com/'))),
-    '#default_value' => $kakadu_url,
-    '#size' => 20
-  );
-
-  // ajax wrapper for url checking
-  $form['wrapper'] = array(
+  $form['islandora_kakadu_url'] = array(
     '#prefix' => '<div id="islandora-url">',
     '#suffix' => '</div>',
-    '#type' => $kakadu_view,
-  );
-
-  $form['wrapper']['islandora_kakadu_url'] = array(
     '#type' => 'textfield',
     '#title' => t("Path to kakadu"),
     '#default_value' => $kakadu_url,
@@ -81,6 +89,11 @@ function islandora_large_image_admin($form, &$form_state) {
       'effect' => 'fade',
       'event' => 'blur',
       'progress' => array('type' => 'throbber'),
+    ),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="islandora_use_kakadu"]' => array('checked' => TRUE),
+      ),
     ),
   );
 
@@ -119,8 +132,5 @@ function islandora_large_image_admin_submit($form, &$form_state) {
 }
 
 function islandora_update_kakadu_url_div($form, $form_state) {
-  unset($form_state['submit_handlers']);
-  $form_state['rebuild'] = TRUE;
-
-  return $form['wrapper'];
+  return $form['islandora_kakadu_url'];
 }
