@@ -169,11 +169,8 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
       variable_get('islandora_large_image_uncompress_tiff', TRUE)) {
       $c_args[] = "-compress None";
     }
-
     $c_dest = file_create_filename(drupal_basename($src) . ".tif", 'temporary://');
-
     $src = islandora_large_image_imagemagick_convert($src, $c_dest, $c_args);
-
     $unlink_source = TRUE;
   }
 
@@ -181,11 +178,23 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   $src = drupal_realpath($src);
   $dest = drupal_realpath($dest);
   $ret = -1;
+  $ret_palette = 0;
   $output = array();
   $kdu_compress = variable_get('islandora_kakadu_url', 'kdu_compress');
   $command = "$kdu_compress -i \"$src\" -o \"$dest\" $args 2>&1";
   exec($command, $output, $ret);
-  if ($ret != 0) {
+
+  $output_string = implode(' ', $output);
+
+  if (strpos($output_string, 'no_palette') !== FALSE) {
+    // Warning was thrown re-create with the -no_palette flag so we don't end
+    // up with a corrupted JP2.
+    $args .= ' -no_palette';
+    $command = "$kdu_compress -i \"$src\" -o \"$dest\" $args 2>&1";
+    exec($command, $output, $ret_palette);
+  }
+
+  if ($ret != 0 || $ret_palette != 0) {
     $message = 'kdu_compress failed to create derivative<br/>Error: @ret<br/>Command: @command <br/>Output !output';
     $variables = array('@ret' => $ret, '@command' => $command, '!output' => implode('<br/>', $output));
     watchdog('islandora_large_image', $message, $variables, WATCHDOG_ERROR);
