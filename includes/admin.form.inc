@@ -31,11 +31,12 @@ function islandora_large_image_admin(array $form, array &$form_state) {
       '#default_value' => $get_default_value('islandora_lossless', FALSE),
       '#description' => t('Lossless derivative are of higher quality, but will adversely affect browser performance.'),
     ),
+    // Defaults to trying to use Kakadu if ImageMagick does not support JP2Ks.
     'islandora_use_kakadu' => array(
       '#type' => 'checkbox',
       '#title' => t("Use Kakadu for image compression?"),
       '#disabled' => !$imagemagick_supports_jp2000,
-      '#default_value' => $get_default_value('islandora_use_kakdu', !$imagemagick_supports_jp2000) && $imagemagick_supports_jp2000,
+      '#default_value' => $get_default_value('islandora_use_kakadu', !$imagemagick_supports_jp2000) || !$imagemagick_supports_jp2000,
       '#description' => t("!kakadu offers faster derivative creation than the standard ImageMagick package. %magick_info", array(
                         '!kakadu' => l(t('kakadu'), 'http://www.kakadusoftware.com/'),
                         '%magick_info' => $imagemagick_supports_jp2000 ?
