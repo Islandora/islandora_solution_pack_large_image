@@ -192,7 +192,7 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $params = array(
     'jp2_url' => $jp2_url,
   );
-  $viewer = islandora_get_viewer($params, 'islandora_large_image_viewers');
+  $viewer = islandora_get_viewer($params, 'islandora_large_image_viewers', $islandora_object);
   $variables['islandora_content'] = '';
   if ($viewer) {
     $variables['islandora_content'] = $viewer;
