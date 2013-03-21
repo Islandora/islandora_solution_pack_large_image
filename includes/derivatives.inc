@@ -11,11 +11,14 @@
  *
  * @param FedoraObject $object
  *   The object to add derivatives to.
+ * @param bool $force
+ *   Whether or not we should force the derivatives to be created, in the case
+ *   that they already exist on the given object.
  *
  * @return boolean
  *   TRUE if all derivatives were created successfully, FALSE otherwise.
  */
-function islandora_large_image_create_all_derivatives(AbstractFedoraObject $object) {
+function islandora_large_image_create_all_derivatives(AbstractFedoraObject $object, $force = TRUE) {
   if (!isset($object['OBJ'])) {
     drupal_set_message(t('Could not create image derivatives for %s.  No image file was uploaded.', array('%s' => $object->id)), 'error');
     return FALSE;
@@ -23,9 +26,9 @@ function islandora_large_image_create_all_derivatives(AbstractFedoraObject $obje
   $base_name = str_replace(':', '-', $object->id);
   $uploaded_file = islandora_large_image_get_uploaded_file($object, $base_name);
   if ($uploaded_file) {
-    $jp2 = islandora_large_image_create_JP2_derivative($object, $uploaded_file, $base_name);
-    $jpg = islandora_large_image_create_JPG_derivative($object, $uploaded_file, $base_name);
-    $tn = islandora_large_image_create_TN_derivative($object, $uploaded_file, $base_name);
+    $jp2 = islandora_large_image_create_JP2_derivative($object, $uploaded_file, $base_name, $force);
+    $jpg = islandora_large_image_create_JPG_derivative($object, $uploaded_file, $base_name, $force);
+    $tn = islandora_large_image_create_TN_derivative($object, $uploaded_file, $base_name, $force);
     return $jp2 && $jpg && $tn && file_unmanaged_delete($uploaded_file);
   }
   return FALSE;
@@ -59,35 +62,41 @@ function islandora_large_image_get_uploaded_file(AbstractFedoraObject $object, $
  *   The file path to the uploaded image file to derive from.
  * @param string $base_name
  *   The base name to use in creating temp files.
+ * @param bool $force
+ *   Whether or not we should force the derivatives to be created, in the case
+ *   that they already exist on the given object.
  *
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_large_image_create_JP2_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name) {
-  // create JP2 with kakadu
-  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
-  $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
-  $mime = strtolower($object['OBJ']->mimetype);
-  if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
-    $kakadu = FALSE;
-  }
-
-  if ($kakadu) {
-    $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2"); // Create JP2
-    if (!$derivative_file) {
-      drupal_set_message(t("Kakadu failed.  Trying ImageMagick"));
-      $kakadu = FALSE; //forces retry with IMageMagick if Kakadu has failed - allows compressed tiffs if unsupported by Kakadu version
+function islandora_large_image_create_JP2_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name, $force = TRUE) {
+  if ($force || !isset($object['JP2'])) {
+    // create JP2 with kakadu
+    module_load_include('inc', 'islandora_large_image', 'includes/utilities');
+    $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
+    $mime = strtolower($object['OBJ']->mimetype);
+    if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+      $kakadu = FALSE;
     }
+
+    if ($kakadu) {
+      $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2"); // Create JP2
+      if (!$derivative_file) {
+        drupal_set_message(t("Kakadu failed.  Trying ImageMagick"));
+        $kakadu = FALSE; //forces retry with IMageMagick if Kakadu has failed - allows compressed tiffs if unsupported by Kakadu version
+      }
+    }
+    if (!$kakadu) {
+      $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
+    }
+    if ($derivative_file === FALSE) {
+      drupal_set_message(t('Failed to create JP2 derivative'), 'error');
+      return FALSE;
+    }
+    islandora_large_image_add_datastream($object, 'JP2', $derivative_file, 'image/jp2', t('JPEG 2000'));
+    return file_unmanaged_delete($derivative_file);
   }
-  if (!$kakadu) {
-    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
-  }
-  if ($derivative_file === FALSE) {
-    drupal_set_message(t('Failed to create JP2 derivative'), 'error');
-    return FALSE;
-  }
-  islandora_large_image_add_datastream($object, 'JP2', $derivative_file, 'image/jp2', t('JPEG 2000'));
-  return file_unmanaged_delete($derivative_file);
+  return TRUE;
 }
 
 /**
@@ -99,21 +108,27 @@ function islandora_large_image_create_JP2_derivative(AbstractFedoraObject $objec
  *   The file path to the uploaded image file to derive from.
  * @param string $base_name
  *   The base name to use in creating temp files.
+ * @param bool $force
+ *   Whether or not we should force the derivatives to be created, in the case
+ *   that they already exist on the given object.
  *
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_large_image_create_JPG_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name) {
-  $args = array();
-  $args[] = '-resize ' . escapeshellarg("600 x 800");
-  $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
-  if ($derivative_file === FALSE) {
-    drupal_set_message(t('Failed to create JPG derivative'), 'error');
-    return FALSE;
+function islandora_large_image_create_JPG_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name, $force = TRUE) {
+  if ($force || !isset($object['JPG'])) {
+    $args = array();
+    $args[] = '-resize ' . escapeshellarg("600 x 800");
+    $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
+    if ($derivative_file === FALSE) {
+      drupal_set_message(t('Failed to create JPG derivative'), 'error');
+      return FALSE;
+    }
+    islandora_large_image_add_datastream($object, 'JPG', $derivative_file, 'image/jpeg', t('Medium sized JPEG'));
+    return file_unmanaged_delete($derivative_file);
   }
-  islandora_large_image_add_datastream($object, 'JPG', $derivative_file, 'image/jpeg', t('Medium sized JPEG'));
-  return file_unmanaged_delete($derivative_file);
+  return TRUE;
 }
 
 /**
@@ -125,21 +140,27 @@ function islandora_large_image_create_JPG_derivative(AbstractFedoraObject $objec
  *   The file path to the uploaded image file to derive from.
  * @param string $base_name
  *   The base name to use in creating temp files.
+ * @param bool $force
+ *   Whether or not we should force the derivatives to be created, in the case
+ *   that they already exist on the given object.
  *
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_large_image_create_TN_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name) {
-  $args = array();
-  $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-  $args[] = '-resize ' . escapeshellarg("200 x 200");
-  $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
-  if ($derivative_file === FALSE) {
-    drupal_set_message(t('Failed to create TN derivative'), 'error');
-    return FALSE;
+function islandora_large_image_create_TN_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name, $force = TRUE) {
+  if ($force || !isset($object['TN'])) {
+    $args = array();
+    $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
+    $args[] = '-resize ' . escapeshellarg("200 x 200");
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
+    if ($derivative_file === FALSE) {
+      drupal_set_message(t('Failed to create TN derivative'), 'error');
+      return FALSE;
+    }
+    islandora_large_image_add_datastream($object, 'TN', $derivative_file, 'image/jpeg', t('Thumbnail'));
+    return file_unmanaged_delete($derivative_file);
   }
-  islandora_large_image_add_datastream($object, 'TN', $derivative_file, 'image/jpeg', t('Thumbnail'));
-  return file_unmanaged_delete($derivative_file);
+  return TRUE;
 }
 
 /**
