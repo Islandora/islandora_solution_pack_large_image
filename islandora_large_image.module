@@ -151,6 +151,7 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_object_
  *   an array of variables that will be passed to the theme function
  */
 function islandora_large_image_preprocess_islandora_large_image(&$variables) {
+  dd('preprocess large image');
   drupal_add_js('misc/form.js');
   drupal_add_js('misc/collapse.js');
   $islandora_object = $variables['islandora_object'];
@@ -195,6 +196,11 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $viewer = islandora_get_viewer($params, 'islandora_large_image_viewers', $islandora_object);
   $variables['islandora_content'] = '';
   if ($viewer) {
+    if (strpos($viewer, 'islandora-openseadragon')) {
+      if ($islandora_object['JP2']) {
+        $variables['image_clip'] = l(t('Clip Image'), "islandora/object/{$islandora_object->id}/print", array('attributes' => array('title' => 'Clip Image', 'id' => 'clip')));
+      }
+    }
     $variables['islandora_content'] = $viewer;
   }
   elseif (isset($islandora_object['JPG'])) { // If no viewer is configured just show the jpeg.
@@ -222,4 +228,52 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_ingest_
       'file' => 'includes/image_upload.form.inc'
     )
   );
+}
+
+/**
+ * Implements hook_process_theme().
+ */
+function islandora_large_image_preprocess_islandora_object_print(array &$variables) {
+  dd('large imagepreprocess print');
+  $object = $variables['object'];
+  if (in_array('islandora:sp_large_image_cmodel', $object->models)) {
+    $url = url("islandora/object/{$object->id}", array('absolute' => TRUE));
+    $variables['content']['link'] = array(
+      '#weight' => -10,
+      '#markup' => t('Persistent link: ') . l($url, $url),
+    );
+  }
+}
+
+/**
+ * Implements hook_process_theme().
+ */
+function islandora_large_image_process_islandora_object_print(array &$variables) {
+  $object = $variables['object'];
+    if (in_array('islandora:sp_large_image_cmodel', $object->models)) {
+    $clip = isset($variables['clip']) ? $variables['clip'] : NULL;
+    $variables['content']['buttons'] = array(
+      '#access' => isset($clip),
+      '#prefix' => '<div>',
+      '#suffix' => '</div></br>',
+      '#weight' => -5,
+      'print' => array(
+        '#prefix' => '<strong>',
+        '#markup' => l(t('Print'), 'javascript:window.print();', array('external' => TRUE)),
+        '#suffix' => '</strong>',
+        '#weight' => -5,
+      ),
+      '0' => array(
+        '#markup' => ' | ',
+        '#weight' => -5,
+      ),
+      'download_clip' => array(
+        '#prefix' => '<strong>',
+        '#markup' => l(t('Download Image'), "islandora/object/{$object->id}/download_clip", array(
+                     'query' => array('clip' => $clip))),
+        '#suffix' => '</strong>',
+        '#weight' => -5,
+      ),
+    );
+  }
 }
