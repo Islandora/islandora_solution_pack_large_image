@@ -151,7 +151,6 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_object_
  *   an array of variables that will be passed to the theme function
  */
 function islandora_large_image_preprocess_islandora_large_image(&$variables) {
-  dd('preprocess large image');
   drupal_add_js('misc/form.js');
   drupal_add_js('misc/collapse.js');
   $islandora_object = $variables['islandora_object'];
@@ -234,7 +233,6 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_ingest_
  * Implements hook_process_theme().
  */
 function islandora_large_image_preprocess_islandora_object_print(array &$variables) {
-  dd('large imagepreprocess print');
   $object = $variables['object'];
   if (in_array('islandora:sp_large_image_cmodel', $object->models)) {
     $url = url("islandora/object/{$object->id}", array('absolute' => TRUE));
