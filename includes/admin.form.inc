@@ -27,31 +27,31 @@ function islandora_large_image_admin(array $form, array &$form_state) {
   $form = array(
     'islandora_lossless' => array(
       '#type' => 'checkbox',
-      '#title' => t("Lossless Derivative Creation?"),
+      '#title' => t("Create Lossless Derivatives"),
       '#default_value' => $get_default_value('islandora_lossless', FALSE),
-      '#description' => t('Lossless derivative are of higher quality, but will adversely affect browser performance.'),
+      '#description' => t('Lossless derivatives are of higher quality but adversely affect browser performance.'),
     ),
     // Defaults to trying to use Kakadu if ImageMagick does not support JP2Ks.
     'islandora_use_kakadu' => array(
       '#type' => 'checkbox',
-      '#title' => t("Use Kakadu for image compression?"),
+      '#title' => t("Use Kakadu for image compression"),
       '#disabled' => !$imagemagick_supports_jp2000,
       '#default_value' => $get_default_value('islandora_use_kakadu', !$imagemagick_supports_jp2000) || !$imagemagick_supports_jp2000,
       '#description' => t("!kakadu offers faster derivative creation than the standard ImageMagick package. %magick_info", array(
-                        '!kakadu' => l(t('kakadu'), 'http://www.kakadusoftware.com/'),
+                        '!kakadu' => l(t('Kakadu'), 'http://www.kakadusoftware.com/'),
                         '%magick_info' => $imagemagick_supports_jp2000 ?
-                        t('ImageMagick reports support of JPEG-2000s.') :
-                        t('ImageMagick does not report support of JPEG-2000.'),
+                        t('ImageMagick reports support for JPEG 2000.') :
+                        t('ImageMagick does not report support for JPEG 2000.'),
                       )),
     ),
     'islandora_large_image_uncompress_tiff' => array(
       '#type' => 'checkbox',
-      '#title' => t('Uncompress TIFF files prior to creating JP2?'),
-      '#description' => t('The version of Kakadu shipped with Djatoka does not ' .
+      '#title' => t('Uncompress TIFF files prior to creating JP2 datastreams'),
+      '#description' => t('The version of Kakadu shipped with djatoka does not ' .
                       'support compressed TIFFs; therefore, it is likely desirable to ' .
                       'uncompress the TIFF so Kakadu does not encounter an error. This will ' .
                       'not change the original TIFF stored in the OBJ datastream. Only ' .
-                      'disable if you are completely sure!'),
+                      'disable this if you are completely sure!'),
       '#default_value' => $get_default_value('islandora_large_image_uncompress_tiff', TRUE),
       '#states' => array(
         'visible' => array(
@@ -61,9 +61,9 @@ function islandora_large_image_admin(array $form, array &$form_state) {
     ),
     'islandora_kakadu_url' => array(
       '#type' => 'textfield',
-      '#title' => t("Path to kakadu"),
+      '#title' => t("Path to Kakadu"),
       '#default_value' => $kakadu,
-      '#description' => t('Path to kakadu.<br/>!msg', array('!msg' => islandora_executable_available_message($kakadu))),
+      '#description' => t('Path to the kdu_compress executable.<br/>!msg', array('!msg' => islandora_executable_available_message($kakadu))),
       '#prefix' => '<div id="kakadu-wrapper">',
       '#suffix' => '</div>',
       '#ajax' => array(
