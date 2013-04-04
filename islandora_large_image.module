@@ -12,8 +12,8 @@
 function islandora_large_image_menu() {
   $items = array();
   $items['admin/islandora/large_image'] = array(  // @TODO: solution pack admin pages one nested deeper?
-    'title' => 'Large Image Collection', // @TODO: should this just be named 'Large image'? are configuring the collection or the solution pack?
-    'description' => 'Configure the Large Image solution pack.',
+    'title' => 'Large Image Collection',
+    'description' => 'Configure the Large Image Solution Pack.',
     'page callback' => 'drupal_get_form',
     'access arguments' => array('administer site configuration'),
     'page arguments' => array('islandora_large_image_admin'),
