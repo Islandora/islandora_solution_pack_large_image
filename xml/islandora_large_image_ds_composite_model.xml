@@ -21,7 +21,7 @@
     <form MIME="image/jpg"></form>
   </dsTypeModel>
   <dsTypeModel ID="OBJ" ORDERED="false">
-    <form MIME="image/jpg"></form>
+    <form MIME="image/tif"></form>
   </dsTypeModel>
   <dsTypeModel ID="TECHMD">
     <form MIME="text/xml"></form>
