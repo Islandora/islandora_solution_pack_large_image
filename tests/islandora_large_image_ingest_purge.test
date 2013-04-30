@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * @file
+ * Attempts to ingest a TIFF into a randomly generated large image collection.
+ */
+
+class IslandoraLargeImageIngestTestCase extends CollectionWebTestCase {
+
+  /**
+   * Get test information.
+   *
+   * @see IslandoraWebTestCase::getInfo()
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Large Image Ingest/Purge',
+      'description' => 'Ingests and purges a TIFF image from a randomly generated large image collection',
+      'group' => 'Islandora Object Management',
+    );
+  }
+
+  /**
+   * Set up the test environment.
+   *
+   * @see IslandoraWebTestCase::setUp()
+   */
+  public function setUp() {
+    parent::setUp(array(
+      'islandora',
+      'islandora_large_image',
+      'islandora_basic_collection',
+      'imagemagick',
+    ));
+  }
+
+  /**
+   * Creates an administrative user and attempts to ingest a test TIFF.
+   */
+  public function testIngestPurgeLargeImage() {
+
+    // Sets up the testing space.
+    $user = $this->createDrupalAdminUser();
+    $this->drupalLogin($user);
+    $label = $this->randomName(16);
+    $suffix = $this->randomName(16);
+    $collectionpid = 'islandora:' . $suffix;
+    $this->createRootTestCollection($label, 'islandora:sp_large_image_cmodel', $collectionpid);
+
+    // Attempts to create an object.
+    $path = 'islandora/object/' . $collectionpid . '/manage/overview/ingest';
+    $edit = array();
+    $file = drupal_get_path('module', 'islandora_large_image') . '/tests/fixtures/test.tiff';
+    $edit['files[file]'] = $file;
+    $this->drupalPost($path, $edit, t('Ingest'));
+    $this->assertText('New Object', 'Large image object was created', 'Islandora');
+    $this->assertRaw('/islandora/object/islandora%3A241/datastream/JPG/view', 'JPG datastream visible on View page', 'Islandora');
+
+    // Determines whether or not the appropriate datastreams were created.
+    $objectpid = arg(5, $this->url);
+    $datastreams = array(
+      'RELS-EXT',
+      'DC',
+      'OBJ',
+      'JP2',
+      'JPG',
+      'TN',
+    );
+    $this->assertDatastreams($objectpid, $datastreams);
+
+    // Attempts to delete the object and then collection.
+    $this->deleteTestObject($objectpid, 'New Object');
+    $this->deleteRootTestCollectionByPid($collectionpid);
+  }
+}
