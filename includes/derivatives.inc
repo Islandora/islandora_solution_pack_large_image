@@ -9,13 +9,13 @@
 /**
  * Creates the derivatives for this content model type
  *
- * @param FedoraObject $object
+ * @param AbstractObject $object
  *   The object to add derivatives to.
  *
  * @return boolean
  *   TRUE if all derivatives were created successfully, FALSE otherwise.
  */
-function islandora_large_image_create_all_derivatives(AbstractFedoraObject $object) {
+function islandora_large_image_create_all_derivatives(AbstractObject $object) {
   if (!isset($object['OBJ'])) {
     drupal_set_message(t('Could not create image derivatives for %s. No image file was uploaded.', array('%s' => $object->id)), 'error');
     return FALSE;
@@ -34,7 +34,7 @@ function islandora_large_image_create_all_derivatives(AbstractFedoraObject $obje
 /**
  * Fetches the upload image file from Fedora, and saves it to a temp location.
  *
- * @param FedoraObject $object
+ * @param AbstractObject $object
  *  The object to fetch the uploaded image file from.
  * @param string $base_name
  *  The base name to use in creating temp files.
@@ -42,7 +42,7 @@ function islandora_large_image_create_all_derivatives(AbstractFedoraObject $obje
  * @return string
  *   The file path to the temp file if successful, FALSE otherwise.
  */
-function islandora_large_image_get_uploaded_file(AbstractFedoraObject $object, $base_name) {
+function islandora_large_image_get_uploaded_file(AbstractObject $object, $base_name) {
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($object['OBJ']->mimeType);
   $filename = file_create_filename("{$base_name}_OBJ.{$ext}", 'temporary://');
@@ -53,7 +53,7 @@ function islandora_large_image_get_uploaded_file(AbstractFedoraObject $object, $
 /**
  * Creates the JP2 derived datatstream from the uploaded image file.
  *
- * @param FedoraObject $object
+ * @param AbstractObject $object
  *   The object to add the derived datastream to.
  * @param string $uploaded_file
  *   The file path to the uploaded image file to derive from.
@@ -63,7 +63,7 @@ function islandora_large_image_get_uploaded_file(AbstractFedoraObject $object, $
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_large_image_create_JP2_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name) {
+function islandora_large_image_create_JP2_derivative(AbstractObject $object, $uploaded_file, $base_name) {
   // create JP2 with kakadu
   module_load_include('inc', 'islandora_large_image', 'includes/utilities');
   $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
@@ -93,7 +93,7 @@ function islandora_large_image_create_JP2_derivative(AbstractFedoraObject $objec
 /**
  * Creates the JPG derived datatstream from the uploaded image file.
  *
- * @param FedoraObject $object
+ * @param AbstractObject $object
  *   The object to add the derived datastream to.
  * @param string $uploaded_file
  *   The file path to the uploaded image file to derive from.
@@ -103,7 +103,7 @@ function islandora_large_image_create_JP2_derivative(AbstractFedoraObject $objec
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_large_image_create_JPG_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name) {
+function islandora_large_image_create_JPG_derivative(AbstractObject $object, $uploaded_file, $base_name) {
   $args = array();
   $args[] = '-resize ' . escapeshellarg("600 x 800");
   $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
@@ -119,7 +119,7 @@ function islandora_large_image_create_JPG_derivative(AbstractFedoraObject $objec
 /**
  * Creates the TN derived datatstream from the uploaded image file.
  *
- * @param FedoraObject $object
+ * @param AbstractObject $object
  *   The object to add the derived datastream to.
  * @param string $uploaded_file
  *   The file path to the uploaded image file to derive from.
@@ -129,7 +129,7 @@ function islandora_large_image_create_JPG_derivative(AbstractFedoraObject $objec
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
-function islandora_large_image_create_TN_derivative(AbstractFedoraObject $object, $uploaded_file, $base_name) {
+function islandora_large_image_create_TN_derivative(AbstractObject $object, $uploaded_file, $base_name) {
   $args = array();
   $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
   $args[] = '-resize ' . escapeshellarg("200 x 200");
@@ -263,7 +263,7 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
  *
  * @TODO: could this be a generic function? eg: islandora_add_datastream($object, $dsid, $file). ?
  */
-function islandora_large_image_add_datastream(AbstractFedoraObject $object, $dsid, $file, $mimetype, $label) {
+function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $file, $mimetype, $label) {
   $ds = $object->constructDatastream($dsid, 'M');
   $ds->label = $label;
   $ds->mimeType = $mimetype;
