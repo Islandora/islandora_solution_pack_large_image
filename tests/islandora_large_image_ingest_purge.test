@@ -5,7 +5,7 @@
  * Attempts to ingest a TIFF into a randomly generated large image collection.
  */
 
-class IslandoraLargeImageIngestTestCase extends CollectionWebTestCase {
+class IslandoraLargeImageIngestTestCase extends IslandoraCollectionWebTestCase {
 
   /**
    * Get test information.
