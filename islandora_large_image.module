@@ -135,7 +135,7 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_view_ob
  */
 function islandora_large_image_islandora_sp_large_image_cmodel_islandora_object_ingested($object) {
   module_load_include('inc', 'islandora_large_image', 'includes/derivatives');
-  islandora_large_image_create_all_derivatives($object);
+  islandora_large_image_create_all_derivatives($object, FALSE);
 }
 
 /**
