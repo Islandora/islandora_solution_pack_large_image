@@ -44,6 +44,9 @@ class IslandoraLargeImageIngestTestCase extends IslandoraCollectionWebTestCase {
       'view fedora repository objects',
       'ingest fedora objects',
       'administer site configuration',
+      'manage object properties',
+      'delete fedora objects and datastreams',
+      'create child collection',
     ));
     $this->drupalLogin($user);
 
@@ -63,12 +66,15 @@ class IslandoraLargeImageIngestTestCase extends IslandoraCollectionWebTestCase {
     // Attempts to create an object.
     $path = 'islandora/object/' . $collectionpid . '/manage/overview/ingest';
     $file = drupal_get_path('module', 'islandora_large_image') . '/tests/fixtures/test.tiff';
+    $handle = fopen($file, "r");
+    $contents = fread($handle, filesize($file));
+    fclose($handle);
     $edit = array(
       'files[file]' => $file,
-      );
+    );
     $this->drupalPost($path, $edit, t('Ingest'));
     $this->assertText('New Object', 'Large image object was created', 'Islandora');
-    $object = $this->getPidFromPath($this->url);
+    $object = $this->getObjectFromPath($this->url);
     $this->assertRaw('/datastream/JPG/view', 'JPG datastream visible on View page', 'Islandora');
 
     // Determines whether or not the appropriate datastreams were created.
@@ -81,6 +87,26 @@ class IslandoraLargeImageIngestTestCase extends IslandoraCollectionWebTestCase {
       'TN',
     );
     $this->assertDatastreams($object, $datastreams);
+
+    // Determines whether or not the OBJ datastream matches the original file.
+    if (isset($object['OBJ'])) {
+      $tiff = $object['OBJ']->content;
+      $this->assertTrue($tiff === $contents, 'OBJ datastream matches originally-ingested content', 'Islandora');
+    }
+
+    // Determines whether or not images are valid.
+    $datastreams = array(
+      'TN',
+      'JPG',
+    );
+    $this->assertImageDatastreams($object, $datastreams);
+
+    // Attempts to match image signatures to expected values.
+    $datastreams = array(
+      array('JP2', IMAGETYPE_JP2),
+      array('OBJ', IMAGETYPE_TIFF_II),
+    );
+    $this->assertImageDatastreamType($object, $datastreams);
 
     // Attempts to delete the object and then collection.
     $this->deleteObject($object);
