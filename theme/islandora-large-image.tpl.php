@@ -21,7 +21,6 @@
  * @see theme_islandora_large_image()
  */
 ?>
-
 <div class="islandora-large-image-object islandora" itemscope itemtype="http://schema.org/ImageObject">
   <div class="islandora-large-image-content-wrapper clearfix">
     <?php if ($islandora_content): ?>
