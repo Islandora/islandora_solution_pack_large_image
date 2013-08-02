@@ -21,7 +21,7 @@
  * @see theme_islandora_large_image()
  */
 ?>
-<div class="islandora-large-image-object islandora" itemscope itemtype="http://schema.org/ImageObject">
+<div class="islandora-large-image-object islandora" vocab="http://schema.org" prefix="dcterms: http://purl.org/dc/terms/" typeof="http://schema.org/ImageObject">
   <div class="islandora-large-image-content-wrapper clearfix">
     <?php if ($islandora_content): ?>
       <?php if (isset($image_clip)): ?>
@@ -34,7 +34,7 @@
   <div class="islandora-large-image-sidebar">
     <?php if (!empty($dc_array['dc:description']['value'])): ?>
       <h2><?php print $dc_array['dc:description']['label']; ?></h2>
-      <p itemprop="description"><?php print $dc_array['dc:description']['value']; ?></p>
+      <p property="description"><?php print $dc_array['dc:description']['value']; ?></p>
     <?php endif; ?>
     <?php if ($parent_collections): ?>
       <div>
