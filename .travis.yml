@@ -12,7 +12,7 @@ before_install:
   - cd $HOME
   - git clone -b 7.x git://github.com/Islandora/islandora.git
   - git clone -b 7.x git://github.com/Islandora/islandora_solution_pack_collection.git
-  - wget -c https://raw.github.com/philsogaDGI/islandora_solution_pack_large_image/7.x/adore.sh
+  - wget -c https://raw.github.com/Islandora/islandora_solution_pack_large_image/7.x/adore.sh
   - sudo sh adore.sh
   - export ISLANDORA_DIR=$HOME/islandora
   - $HOME/islandora/tests/scripts/travis_setup.sh
