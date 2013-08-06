@@ -260,7 +260,7 @@ function islandora_large_image_preprocess_islandora_object_print(array &$variabl
     $url = url("islandora/object/{$object->id}", array('absolute' => TRUE));
     $variables['content']['link'] = array(
       '#weight' => -10,
-      '#markup' => t('Persistent link: ') . l($url, $url),
+      '#markup' => t('Persistent link:') . l($url, $url),
     );
   }
 }

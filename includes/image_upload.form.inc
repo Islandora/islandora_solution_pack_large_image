@@ -21,7 +21,7 @@ function islandora_large_image_image_upload_form(array $form, array &$form_state
   $extensions = array('tiff tif');
   return array(
     'file' => array(
-      '#title' => t('Image'),
+      '#title' => check_plain(t('Image')),
       '#type' => 'managed_file',
       '#required' => TRUE,
       '#description' => t('Select image to upload.<br/>Files must be less than <b>!size MB.</b><br/>Allowed file types: <b>!ext.</b>', array('!size' => $upload_size, '!ext' => $extensions[0])),

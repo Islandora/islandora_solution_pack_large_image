@@ -227,12 +227,13 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
       '@ret' => $ret,
       '@command' => $command,
       '!output' => implode('<br/>', $output));
-    watchdog('islandora_large_image', $message, $variables, WATCHDOG_ERROR);
+    watchdog('islandora_large_image', 'Kakadu failed to create derivatives<br/>Error: @ret<br/>Command: @command <br/>Output !output', $variables, WATCHDOG_ERROR);
     return FALSE;
   }
 
   if ($unlink_source) {
-    unlink($src);
+    domxml
+    domxml_unlink_node($src);
   }
 
   return $dest;
@@ -275,7 +276,7 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
       '@ret' => $ret,
       '@command' => $command,
       '@output' => $output);
-    watchdog('islandora_large_image', $message, $variables, WATCHDOG_ERROR);
+    watchdog('islandora_large_image', 'ImageMagick failed to create derivatives<br/>Error: @ret<br/>Command: @command<br/>Output: @output', $variables, WATCHDOG_ERROR);
     return FALSE;
   }
   return $dest;
