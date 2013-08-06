@@ -2,7 +2,6 @@
 
 /**
  * @file
- *
  * Handles the uploading of the image file.
  */
 
@@ -13,11 +12,12 @@
  *   The drupal form.
  * @param array $form_state
  *   The drupal form state.
- * @return
+ * 
+ * @return array
  *   The drupal form definition.
  */
 function islandora_large_image_image_upload_form(array $form, array &$form_state) {
-  $upload_size = min((int)ini_get('post_max_size'), (int)ini_get('upload_max_filesize'));
+  $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
   $extensions = array('tiff tif');
   return array(
     'file' => array(
@@ -29,14 +29,15 @@ function islandora_large_image_image_upload_form(array $form, array &$form_state
       '#upload_location' => 'temporary://',
       '#upload_validators' => array(
         'file_validate_extensions' => $extensions,
-        'file_validate_size' => array($upload_size * 1024 * 1024), // Assume its specified in MB
+        // Assume its specified in MB.
+        'file_validate_size' => array($upload_size * 1024 * 1024),
       ),
-    )
+    ),
   );
 }
 
 /**
- * Submit handler, adds uploaded file to ingest object
+ * Submit handler, adds uploaded file to ingest object.
  *
  * @param array $form
  *   The drupal form.
