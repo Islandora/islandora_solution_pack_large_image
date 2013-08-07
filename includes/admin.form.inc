@@ -47,11 +47,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
     'islandora_large_image_uncompress_tiff' => array(
       '#type' => 'checkbox',
       '#title' => t('Uncompress TIFF files prior to creating JP2 datastreams'),
-      '#description' => t('The version of Kakadu shipped with djatoka does not ' .
-                      'support compressed TIFFs; therefore, it is likely desirable to ' .
-                      'uncompress the TIFF so Kakadu does not encounter an error. This will ' .
-                      'not change the original TIFF stored in the OBJ datastream. Only ' .
-                      'disable this if you are completely sure!'),
+      '#description' => t('The version of Kakadu shipped with djatoka does not support compressed TIFFs; therefore, it is likely desirable to uncompress the TIFF so Kakadu does not encounter an error. This will not change the original TIFF stored in the OBJ datastream. Only disable this if you are completely sure!'),
       '#default_value' => $get_default_value('islandora_large_image_uncompress_tiff', TRUE),
       '#states' => array(
         'visible' => array(
@@ -83,7 +79,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   $form += islandora_viewers_form('islandora_large_image_viewers', 'image/jp2');
   $form['actions'] = array(
-    '#type' => 'actions'
+    '#type' => 'actions',
   );
   $form['actions']['reset'] = array(
     '#type' => 'submit',
@@ -95,7 +91,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
 }
 
 /**
- * Form submit
+ * Form submit.
  */
 function islandora_large_image_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
@@ -106,6 +102,9 @@ function islandora_large_image_admin_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Function update_kakadu_url_div.
+ */
 function islandora_update_kakadu_url_div($form, $form_state) {
   return $form['islandora_kakadu_url'];
 }

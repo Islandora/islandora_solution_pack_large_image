@@ -1,9 +1,13 @@
 <?php
+/**
+ * @file
+ * Utility functions.
+ */
 
 /**
  * Determine if ImageMagick appears to support JPEG-2000.
  *
- * @return boolean
+ * @return bool
  *   If JPEG-2000 appears in the list of supported formats.
  */
 function islandora_large_image_check_imagemagick_for_jpeg2000() {
@@ -17,8 +21,8 @@ function islandora_large_image_check_imagemagick_for_jpeg2000() {
     $supports = FALSE;
     foreach ($filtered as $f) {
       $s = array();
-      if(preg_match_all('/([r-][w-].)/', $f, $s)) {
-        if(strpos($s[1][0], 'w') !== FALSE) {
+      if (preg_match_all('/([r-][w-].)/', $f, $s)) {
+        if (strpos($s[1][0], 'w') !== FALSE) {
           $supports = TRUE;
           break;
         }
@@ -28,4 +32,3 @@ function islandora_large_image_check_imagemagick_for_jpeg2000() {
 
   return $supports;
 }
-
