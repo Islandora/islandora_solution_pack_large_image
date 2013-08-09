@@ -21,10 +21,10 @@ function islandora_large_image_image_upload_form(array $form, array &$form_state
   $extensions = array('tiff tif');
   return array(
     'file' => array(
-      '#title' => check_plain(t('Image')),
+      '#title' => t('Image'),
       '#type' => 'managed_file',
       '#required' => TRUE,
-      '#description' => check_plain(t('Select image to upload.<br/>Files must be less than <b>!size MB.</b><br/>Allowed file types: <b>!ext.</b>', array('!size' => $upload_size, '!ext' => $extensions[0]))),
+      '#description' => filter_xss(t('Select image to upload.<br/>Files must be less than <b>!size MB.</b><br/>Allowed file types: <b>!ext.</b>', array('!size' => $upload_size, '!ext' => $extensions[0])), array('br', 'b')),
       '#default_value' => isset($form_state['values']['files']) ? $form_state['values']['files'] : NULL,
       '#upload_location' => 'temporary://',
       '#upload_validators' => array(
