@@ -232,7 +232,7 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   }
 
   if ($unlink_source) {
-    domxml_unlink_node($src);
+    file_unmanaged_delete($src);
   }
 
   return $dest;
