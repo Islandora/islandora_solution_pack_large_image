@@ -155,14 +155,6 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_view_ob
 }
 
 /**
- * Implements hook_CMODEL_PID_islandora_object_ingested().
- */
-function islandora_large_image_islandora_sp_large_image_cmodel_islandora_object_ingested($object) {
-  module_load_include('inc', 'islandora_large_image', 'includes/derivatives');
-  islandora_large_image_create_all_derivatives($object, FALSE);
-}
-
-/**
  * Implements hook_preprocess().
  */
 function islandora_large_image_preprocess_islandora_large_image(&$variables) {
@@ -296,4 +288,41 @@ function islandora_large_image_process_islandora_object_print(array &$variables)
       ),
     );
   }
+}
+
+/**
+ * Implements hook_CMODEL_islandora_derivative().
+ */
+function islandora_large_image_islandora_sp_large_image_cmodel_islandora_derivative() {
+  $mod_path = drupal_get_path('module', 'islandora_large_image');
+
+  return array(
+    array(
+      'source_dsid' => 'OBJ',
+      'destination_dsid' => 'TN',
+      'weight' => 0,
+      'function' => array(
+        'islandora_large_image_create_tn_derivative',
+      ),
+      'file' => "$mod_path/includes/derivatives.inc",
+    ),
+    array(
+      'source_dsid' => 'OBJ',
+      'destination_dsid' => 'JPG',
+      'weight' => 1,
+      'function' => array(
+        'islandora_large_image_create_jpg_derivative',
+      ),
+      'file' => "$mod_path/includes/derivatives.inc",
+    ),
+    array(
+      'source_dsid' => 'OBJ',
+      'destination_dsid' => 'JP2',
+      'weight' => 2,
+      'function' => array(
+        'islandora_large_image_create_jp2_derivative',
+      ),
+      'file' => "$mod_path/includes/derivatives.inc",
+    ),
+  );
 }
