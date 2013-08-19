@@ -11,8 +11,6 @@
  *
  * @param AbstractObject $object
  *   The object to fetch the uploaded image file from.
- * @param string $base_name
- *   The base name to use in creating temp files.
  *
  * @return string
  *   The file path to the temp file if successful, FALSE otherwise.
