@@ -101,12 +101,9 @@ class IslandoraLargeImageIngestTestCase extends IslandoraCollectionWebTestCase {
     );
     $this->assertImageDatastreams($object, $datastreams);
 
-    // Attempts to match image signatures to expected values.
-    $datastreams = array(
-      array('JP2', IMAGETYPE_JP2),
-      array('OBJ', IMAGETYPE_TIFF_II),
-    );
-    $this->assertImageDatastreamType($object, $datastreams);
+    // Determines whether or not the OBJ and JP2 datastreams are valid.
+    $this->assertTiffDatastreams($object, array('OBJ'));
+    $this->assertJp2Datastreams($object, array('JP2'));
 
     // Attempts to delete the object and then collection.
     $this->deleteObject($object);
