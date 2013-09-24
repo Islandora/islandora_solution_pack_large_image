@@ -164,7 +164,10 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $repository = $islandora_object->repository;
   module_load_include('inc', 'islandora', 'includes/datastream');
   module_load_include('inc', 'islandora', 'includes/utilities');
-  // Get DC metadata.
+  module_load_include('inc', 'islandora', 'includes/metadata');
+
+  // We should eventually remove the DC object and dc_array code as it only
+  // exists to not break legacy implementations.
   if (isset($islandora_object['DC']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['DC'])) {
     try {
       $dc = $islandora_object['DC']->content;
@@ -179,6 +182,9 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   $variables['islandora_object_label'] = $islandora_object->label;
   $variables['theme_hook_suggestions'][] = 'islandora_large_image__' . str_replace(':', '_', $islandora_object->id);
   $variables['parent_collections'] = islandora_get_parents_from_rels_ext($islandora_object);
+  $variables['metadata'] = islandora_retrieve_metadata_markup($islandora_object);
+  $variables['description'] = islandora_retrieve_description_markup($islandora_object);
+
   // Thumbnail.
   if (isset($islandora_object['TN']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['TN'])) {
     $params = array(
