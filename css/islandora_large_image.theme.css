@@ -18,8 +18,13 @@
   clear: both;
 }
 
+/* This is kept for legacy reasons. */
 dl.islandora-large-image-fields {
   width: 100%;
+}
+
+dl.islandora-metadata-fields {
+    width:100%;
 }
 
 .islandora-large-image-metadata dt {
@@ -65,5 +70,5 @@ body.two-sidebars .islandora-large-image-sidebar {
     width: 35%;
     clear: none;
   }
-  
+
 }
