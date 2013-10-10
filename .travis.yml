@@ -18,8 +18,8 @@ before_install:
   - ln -s $TRAVIS_BUILD_DIR sites/all/modules/islandora_solution_pack_large_image
   - ln -s $HOME/islandora_solution_pack_collection sites/all/modules/islandora_solution_pack_collection
   - sudo sh $TRAVIS_BUILD_DIR/adore.sh
-  - drush en --user=1 --yes islandora_basic_collection
-  - drush en --user=1 --yes islandora_large_image
+  - drush dl imagemagick
+  - drush en --user=1 --yes imagemagick islandora_basic_collection islandora_large_image
 script:
   - ant -buildfile sites/all/modules/islandora_solution_pack_large_image/build.xml lint
   - drush coder-review --reviews=production,security,style,i18n,potx,sniffer islandora_large_image
