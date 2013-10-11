@@ -56,7 +56,6 @@ class IslandoraLargeImageIngestTestCase extends IslandoraCollectionWebTestCase {
     $this->createTestCollection($label, 'islandora:sp_large_image_cmodel', $collectionpid);
     variable_set('image_toolkit', 'imagemagick');
     variable_set('imagemagick_convert', $this->imagemagick_convert);
-    $this->drupalPost('admin/config/media/image-toolkit', $edit, 'Save configuration');
 
     // Attempts to create an object.
     $path = 'islandora/object/' . $collectionpid . '/manage/overview/ingest';
