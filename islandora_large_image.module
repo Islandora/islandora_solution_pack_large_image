@@ -174,6 +174,11 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
       $dc_object = DublinCore::importFromXMLString($dc);
     }
     catch (Exception $e) {
+      $variables = array(
+        '@ret' => $e->getMessage(),
+        '@trace' => $e->getTraceAsString(),
+      );
+      watchdog('islandora_large_image', 'Error retrieving object.<br/>Error: @ret<br/>Trace: @trace', $variables, WATCHDOG_ERROR);
       drupal_set_message(t('Error retrieving object %s %t', array('%s' => $islandora_object->id, '%t' => $e->getMessage())), 'error', FALSE);
     }
   }
