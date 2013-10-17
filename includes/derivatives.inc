@@ -312,6 +312,12 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
   $output = '';
   $ret = -1;
   if (_imagemagick_convert_exec($command, $output, $ret) !== TRUE) {
+    $variables = array(
+      '@ret' => $ret,
+      '@command' => $command,
+      '!output' => implode('<br/>', $output),
+    );
+    watchdog('islandora_large_image', 'ImageMagick failed to convert.<br/>Error: @ret<br/>Command: @command <br/>Output !output', $variables, WATCHDOG_ERROR);
     return FALSE;
   }
   return $dest;
@@ -343,7 +349,11 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
     $object->ingestDatastream($ds);
   }
   catch (exception $e) {
-    return $e->getMessage();
+    $variables = array(
+      '@ret' => $e->getMessage(),
+    );
+    watchdog('islandora_large_image', 'Large Image failed to ingest data stream.<br/>Error: @ret', $variables, WATCHDOG_ERROR);
+    return $e->getTraceAsString();
   }
   return TRUE;
 }
