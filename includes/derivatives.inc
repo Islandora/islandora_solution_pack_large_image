@@ -354,12 +354,12 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
       '@ret' => $e->getTraceAsString(),
     );
     // Adding watchdog here, islandora_large_image_add_datastream() calls will
-    // add a dsm statement (success or failure) is returned, but not a watchdog entry.
+    // add a dsm statement, but not a watchdog entry.
     watchdog('islandora_large_image',
       'Large Image failed to ingest data stream.<br/>Stack: @ret',
       $variables,
       WATCHDOG_ERROR);
-    return $e->getTraceAsString();
+    return FALSE;
   }
 }
 
