@@ -14,6 +14,8 @@
   </dsTypeModel>
   <dsTypeModel ID="TN" ORDERED="false">
     <form MIME="image/jpg"/>
+    <form MIME="image/jpeg"/>
+    <form MIME="image/png"/>
   </dsTypeModel>
   <dsTypeModel ID="JPG" ORDERED="false">
     <form MIME="image/jpg"/>
