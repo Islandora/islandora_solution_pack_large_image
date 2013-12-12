@@ -14,21 +14,15 @@ function islandora_large_image_check_imagemagick_for_jpeg2000() {
   $supports =& drupal_static(__FUNCTION__);
 
   if ($supports === NULL) {
-    $command_output = NULL;
-
-    $e = exec(escapeshellcmd(variable_get('imagemagick_convert', 'convert')) . " -list format", $command_output);
-    $filtered = preg_filter("/.*JP2.*JPEG-2000\s+File\s+Format\s+Syntax/", "\\0", $command_output);
-    $supports = FALSE;
-    foreach ($filtered as $f) {
-      $s = array();
-      if (preg_match_all('/([r-][w-].)/', $f, $s)) {
-        if (strpos($s[1][0], 'w') !== FALSE) {
-          $supports = TRUE;
-          break;
-        }
-      }
+    $command = variable_get('imagemagick_convert', 'convert');
+    if (variable_get('imagemagick_gm', 0)) {
+      $command .= ' convert';
     }
+    $command .= " -list format";
+    $command_output = NULL;
+    $e = exec($command, $command_output);
+    $filtered = preg_filter("/.*JP2.*rw.*JPEG-2000/", "\\0", $command_output);
+    $supports = !empty($filtered);
   }
-
   return $supports;
 }

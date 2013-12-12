@@ -297,27 +297,12 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
  *   The destination file path if successful otherwise FALSE.
  */
 function islandora_large_image_imagemagick_convert($src, $dest, $args) {
-  $src = drupal_realpath($src) . '[0]';
-  $dest = drupal_realpath($dest);
-  $context = array(
-    'source' => $src,
-    'destination' => $dest,
-  );
-  drupal_alter('imagemagick_arguments', $args, $context);
-
-  // To make use of ImageMagick 6's parenthetical command grouping we need to
-  // make the $source image the first parameter and $dest the last.
-  // See http://www.imagemagick.org/Usage/basics/#cmdline
-  $command = escapeshellarg($src) . ' ' . implode(' ', $args) . ' ' . escapeshellarg($dest);
-  $output = '';
-  $ret = -1;
-  if (_imagemagick_convert_exec($command, $output, $ret) !== TRUE) {
+  if (_imagemagick_convert($src, $dest, $args) !== TRUE) {
     $variables = array(
-      '@ret' => $ret,
-      '@command' => $command,
-      '!output' => implode('<br/>', $output),
+      '@ret' => $src,
+      '@command' => $dest,
     );
-    watchdog('islandora_large_image', 'ImageMagick failed to convert.<br/>Error: @ret<br/>Command: @command <br/>Output !output', $variables, WATCHDOG_ERROR);
+    watchdog('islandora_large_image', 'ImageMagick failed to convert. @src to @dest', $variables, WATCHDOG_ERROR);
     return FALSE;
   }
   return $dest;
