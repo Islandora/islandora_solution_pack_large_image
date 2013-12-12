@@ -59,7 +59,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
       '#type' => 'textfield',
       '#title' => t("Path to Kakadu"),
       '#default_value' => $kakadu,
-      '#description' => t('Path to the kdu_compress executable.<br/>!msg', array('!msg' => islandora_executable_available_message($kakadu))),
+      '#description' => t('Path to the platform-specific Kakadu binaries (directory of kdu_compress and kdu_expand).<br/>!msg', array('!msg' => islandora_executable_available_message("$kakadu/kdu_compress"))),
       '#prefix' => '<div id="kakadu-wrapper">',
       '#suffix' => '</div>',
       '#ajax' => array(
