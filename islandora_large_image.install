@@ -20,9 +20,10 @@ function islandora_large_image_requirements($phase) {
 
     // Determine if the server is running Windows.
     if (islandora_os_check() == "Windows") {
-      // slangerx, 2013-09-09: To make this command Windows-friendly, "command -v"
-      // should go away (it's Linux-specific). Also, "/dev/null" should be replaced
-      // with "NUL", which is the equivalent Null Device Driver in Windows.
+      // slangerx, 2013-09-09: To make this command Windows-friendly,
+      // "command -v" should go away (it's Linux-specific). Also,
+      // "/dev/null" should be replaced with "NUL", which is the
+      // equivalent Null Device Driver in Windows.
       $command = 'kdu_compress >NUL 2>&1';
     }
 
