@@ -9,6 +9,7 @@
  * Implements hook_requirements().
  */
 function islandora_large_image_requirements($phase) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $requirements = array();
   if ($phase == 'install') {
     $t = get_t();
@@ -17,8 +18,8 @@ function islandora_large_image_requirements($phase) {
 
     $command = 'command -v kdu_compress >/dev/null 2>&1';
 
-    // Determine if the server is running Windows.
-    if (islandora_os_check() == "Windows") {
+    // Determine if the server's operating system is Windows.
+    if (islandora_deployed_on_windows()) {
       // slangerx: Make this command Windows-friendly.
       $command = 'kdu_compress >NUL 2>&1';
     }
