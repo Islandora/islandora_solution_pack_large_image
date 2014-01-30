@@ -40,8 +40,8 @@ function islandora_large_image_theme($existing, $type, $theme, $path) {
       'pattern' => 'islandora_large_image__',
       'variables' => array('islandora_object' => NULL),
     ),
-    'islandora_default_print' => array(
-      'template' => 'theme/islandora-object-img-print',
+    'islandora_large_image_print' => array(
+      'template' => 'theme/islandora-large-image-print',
       'variables' => array('islandora_content' => NULL),
     ),
   );
@@ -61,7 +61,7 @@ function islandora_large_image_islandora_view_print_object($object) {
 
     // Theme the image seperatly.
     $variables['islandora_img'] = theme('image', $params);
-    $output = theme('islandora_default_print', array(
+    $output = theme('islandora_large_image_print', array(
       'islandora_content' => $variables['islandora_img']));
   }
 
