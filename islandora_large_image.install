@@ -18,9 +18,7 @@ function islandora_large_image_requirements($phase) {
 
     $command = 'command -v kdu_compress >/dev/null 2>&1';
 
-    // Determine if the server's operating system is Windows.
     if (islandora_deployed_on_windows()) {
-      // Update the command so it's Windows-friendly.
       $command = 'kdu_compress >NUL 2>&1';
     }
 
