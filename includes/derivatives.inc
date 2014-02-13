@@ -77,7 +77,8 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       );
     }
     else {
-      if (TRUE === islandora_large_image_add_datastream($object, 'JP2', $derivative_file, 'image/jp2', t('JPEG 2000'))) {
+      $added_successfully = islandora_large_image_add_datastream($object, 'JP2', $derivative_file, 'image/jp2', t('JPEG 2000'));
+      if (TRUE === $added_successfully) {
         $to_return['messages'][] = array(
           'message' => t('Created JP2 derivative.'),
           'type' => 'dsm',
@@ -87,13 +88,12 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       }
       else {
         $to_return['messages'][] = array(
-          'message' => t('Failed to add JP2 derivative to the object.'),
+          'message' => t('Failed to add JP2 derivative to the object. Error message: @message', array('@message' => $added_successfully)),
           'type' => 'dsm',
           'severity' => 'warning',
         );
       }
     }
-
     file_unmanaged_delete($uploaded_file);
     file_unmanaged_delete($derivative_file);
     return $to_return;
@@ -133,7 +133,8 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
       );
     }
     else {
-      if (TRUE === islandora_large_image_add_datastream($object, 'JPG', $derivative_file, 'image/jpeg', t('Medium sized JPEG'))) {
+      $added_successfully = islandora_large_image_add_datastream($object, 'JPG', $derivative_file, 'image/jpeg', t('Medium sized JPEG'));
+      if (TRUE === $added_successfully) {
         $to_return['messages'][] = array(
           'message' => t('Created JPG derivative.'),
           'type' => 'dsm',
@@ -143,7 +144,7 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
       }
       else {
         $to_return['messages'][] = array(
-          'message' => t('Failed to add JPG derivative to the object.'),
+          'message' => t('Failed to add JPG derivative to the object. Error message: @message', array('@message' => $added_successfully)),
           'type' => 'dsm',
           'severity' => 'warning',
         );
@@ -190,7 +191,8 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
       );
     }
     else {
-      if (TRUE === islandora_large_image_add_datastream($object, 'TN', $derivative_file, 'image/jpeg', t('Thumbnail'))) {
+      $added_successfully = islandora_large_image_add_datastream($object, 'TN', $derivative_file, 'image/jpeg', t('Thumbnail'));
+      if (TRUE === $added_successfully) {
         $to_return['messages'][] = array(
           'message' => t('Created TN derivative.'),
           'type' => 'dsm',
@@ -200,7 +202,7 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
       }
       else {
         $to_return['messages'][] = array(
-          'message' => t('Failed to add TN derivative to the object.'),
+          'message' => t('Failed to add TN derivative to the object. Error message: @message', array('@message' => $added_successfully)),
           'type' => 'dsm',
           'severity' => 'warning',
         );
@@ -326,7 +328,7 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
 /**
  * Adds a datastream to an object.
  *
- * @param object $object
+ * @param AbstractObject $object
  *   The object to add a datastream to.
  * @param string $dsid
  *   The datastream ID to be added.
@@ -337,16 +339,25 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
  * @param string $label
  *   The label for the datastream.
  *
- * @TODO: could this be a generic function? eg:
- *  islandora_add_datastream($object, $dsid, $file). ?
+ * @return bool|string
+ *   TRUE if the datastream was added/modified successfully, the error message
+ *   otherwise.
  */
 function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $file, $mimetype, $label) {
-  $ds = $object->constructDatastream($dsid, 'M');
-  $ds->label = $label;
-  $ds->mimeType = $mimetype;
-  $ds->setContentFromFile($file);
   try {
-    $object->ingestDatastream($ds);
+    $ingest = !isset($object[$dsid]);
+    if ($ingest) {
+      $ds = $object->constructDatastream($dsid, 'M');
+      $ds->label = $label;
+      $ds->mimeType = $mimetype;
+    }
+    else {
+      $ds = $object[$dsid];
+    }
+    $ds->setContentFromFile($file);
+    if ($ingest) {
+      $object->ingestDatastream($ds);
+    }
     return TRUE;
   }
   catch (exception $e) {
@@ -359,7 +370,8 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
       'Large Image failed to ingest data stream.<br/>Stack: @ret',
       $variables,
       WATCHDOG_ERROR);
-    return FALSE;
+    $message = $e->getMessage();
+    return $message;
   }
 }
 
