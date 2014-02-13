@@ -50,10 +50,19 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
     $mime = strtolower($object['OBJ']->mimetype);
     if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+      // Force jpeg conversions through ImageMagick rather than Kakadu.
       $kakadu = FALSE;
     }
 
-    if ($kakadu) {
+    // If we already have a JPEG2000 file, just copy it to the JP2 datastream.
+    if ($mime == 'image/jp2') {
+      $derivative_file = $uploaded_file;
+    }
+    else {
+      $derivative_file = FALSE;
+    }
+
+    if (!$derivative_file && $kakadu) {
       // Create JP2.
       $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
       if ($derivative_file === FALSE) {
@@ -66,7 +75,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         $kakadu = FALSE;
       }
     }
-    if (!$kakadu) {
+    if (!$derivative_file && !$kakadu) {
       $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
     }
     if ($derivative_file === FALSE) {
@@ -257,7 +266,13 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   $ret = -1;
   $ret_palette = 0;
   $output = array();
-  $kdu_compress = variable_get('islandora_kakadu_url', 'kdu_compress');
+  $kdu_home = variable_get('islandora_kakadu_url', FALSE);
+  if ($kdu_home) {
+    $kdu_compress = "$kdu_home/kdu_compress";
+  }
+  else {
+    $kdu_compress = 'kdu_compress';
+  }
   $command = "$kdu_compress -i \"$src\" -o \"$dest\" $args 2>&1";
   exec($command, $output, $ret);
 
@@ -277,6 +292,51 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
 
   if ($unlink_source) {
     file_unmanaged_delete($src);
+  }
+
+  return $dest;
+}
+
+/**
+ * Calls kdu_expand with the given arguments, or defaults if none are provided.
+ *
+ * @param string $src
+ *   The source file to pass to kdu_expand
+ * @param string $dest
+ *   The destination file which kdu_expand will generate.
+ * @param string $args
+ *   Any additional arguments for kdu_expand, if not provided reasonable
+ *   defaults will be used.
+ *
+ * @return bool
+ *   Returns the newly generated file uri or FALSE if the conversion failed
+ */
+function islandora_large_image_kdu_expand($src, $dest, $args = NULL) {
+  $args = isset($args) ? $args : '';
+  $src = drupal_realpath($src);
+  $dest = drupal_realpath($dest);
+  $ret = -1;
+  $output = array();
+  $kdu_home = variable_get('islandora_kakadu_url', FALSE);
+  if ($kdu_home) {
+    $kdu_expand = "$kdu_home/kdu_expand";
+  }
+  else {
+    $kdu_expand = 'kdu_expand';
+  }
+  $command = "$kdu_expand -i \"$src\" -o \"$dest\" $args 2>&1";
+  exec($command, $output, $ret);
+
+  $output_string = implode(' ', $output);
+
+  if ($ret != 0) {
+    $variables = array(
+      '@ret' => $ret,
+      '@command' => $command,
+      '!output' => implode('<br/>', $output),
+    );
+    watchdog('islandora_large_image', 'Kakadu failed to create derivatives<br/>Error: @ret<br/>Command: @command <br/>Output !output', $variables, WATCHDOG_ERROR);
+    return FALSE;
   }
 
   return $dest;
@@ -373,6 +433,7 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
     $message = $e->getMessage();
     return $message;
   }
+  return TRUE;
 }
 
 /**
@@ -405,6 +466,7 @@ function islandora_large_image_get_args() {
     $args[] = "-define jp2:cblkheight=64";
     $args[] = "-define jp2:sop";
   }
+
   return $args;
 }
 

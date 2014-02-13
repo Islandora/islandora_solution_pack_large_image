@@ -6,28 +6,6 @@
  */
 
 /**
- * Implements hook_requirements().
- */
-function islandora_large_image_requirements($phase) {
-  $requirements = array();
-  if ($phase == 'install') {
-    $t = get_t();
-    $out = array();
-    $ret = 1;
-    exec('command -v kdu_compress >/dev/null 2>&1', $out, $ret);
-    if ($ret != 0) {
-      $requirements['kakadu'] = array(
-        'title' => $t("Kakadu Image Compression"),
-        'value' => $t("Not installed"),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('Ensure that adore-djatoka is installed and that kdu_compress is accessible by PHP.'),
-      );
-    }
-  }
-  return $requirements;
-}
-
-/**
  * Implements hook_install().
  *
  * @see islandora_large_image_islandora_required_objects()
@@ -35,6 +13,21 @@ function islandora_large_image_requirements($phase) {
 function islandora_large_image_install() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   islandora_install_solution_pack('islandora_large_image');
+}
+
+/**
+ * Update islandora_kakadu_url variable.
+ *
+ * Implements hook_update_N().
+ *
+ * Previous versions specified the path to the kdu_compress executable.
+ * Since we also now need to use kdu_expand, this variable is being
+ * rewritten to point to the Kakadu executable directory.
+ */
+function islandora_large_image_update_7100(&$sandbox) {
+  $kdu_home = variable_get('islandora_kakadu_url', FALSE);
+  $kdu_home = preg_replace('#/kdu-compress$#', '', $kdu_home);
+  variable_set('islandora_kakadu_url', $kdu_home);
 }
 
 /**
