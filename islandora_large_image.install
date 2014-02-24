@@ -9,12 +9,21 @@
  * Implements hook_requirements().
  */
 function islandora_large_image_requirements($phase) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $requirements = array();
   if ($phase == 'install') {
     $t = get_t();
     $out = array();
     $ret = 1;
-    exec('command -v kdu_compress >/dev/null 2>&1', $out, $ret);
+
+    $command = 'command -v kdu_compress >/dev/null 2>&1';
+
+    if (islandora_deployed_on_windows()) {
+      $command = 'kdu_compress >NUL 2>&1';
+    }
+
+    exec($command, $out, $ret);
+
     if ($ret != 0) {
       $requirements['kakadu'] = array(
         'title' => $t("Kakadu Image Compression"),
