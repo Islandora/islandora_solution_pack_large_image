@@ -52,7 +52,6 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
       $kakadu = FALSE;
     }
-    $lossless = TRUE;
     $lossless = variable_get('islandora_lossless', FALSE);
     // Use lossless if the image would look too bad with compression.
     if (!$lossless) {
