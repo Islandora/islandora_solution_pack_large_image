@@ -57,9 +57,12 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if (!$lossless) {
       $identify = islandora_large_image_get_identify();
       $file = drupal_realpath($uploaded_file);
+      $height = exec(escapeshellcmd("$identify -format \"%h\" $file"));
+      $width = exec(escapeshellcmd("$identify -format \"%W\" $file"));
       $y_resolution = exec(escapeshellcmd("$identify -format \"%y\" $file"));
       $x_resolution = exec(escapeshellcmd("$identify -format \"%x\" $file"));
-      if ((int) $x_resolution < 300 || (int) $y_resolution < 300) {
+      if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
+        ($height < 1024 || $width < 1024)) {
         $lossless = TRUE;
       }
     }
