@@ -52,8 +52,20 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
       $kakadu = FALSE;
     }
+    $lossless = TRUE;
+    $lossless = variable_get('islandora_lossless', FALSE);
+    // Use lossless if the image would look too bad with compression.
+    if (!$lossless) {
+      $identify = islandora_large_image_get_identify();
+      $file = drupal_realpath($uploaded_file);
+      $y_resolution = exec(escapeshellcmd("$identify -format \"%y\" $file"));
+      $x_resolution = exec(escapeshellcmd("$identify -format \"%x\" $file"));
+      if ((int) $x_resolution < 300 || (int) $y_resolution < 300) {
+        $lossless = TRUE;
+      }
+    }
 
-    if ($kakadu) {
+    if ($kakadu && !$lossless) {
       // Create JP2.
       $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
       if ($derivative_file === FALSE) {
@@ -66,8 +78,12 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         $kakadu = FALSE;
       }
     }
-    if (!$kakadu) {
-      $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
+    else {
+      $derivative_file = islandora_large_image_imagemagick_convert(
+        $uploaded_file,
+        "temporary://{$base_name}_JP2.jp2",
+        islandora_large_image_get_args($lossless)
+      );
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -377,12 +393,15 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
 
 /**
  * Return preconfigured paramaters for ImageMagick JP2 creation.
+ *
+ * @param bool $lossless
+ *   Weather or not the conversion should be lossless.
+ *
  * @return array
  *   Returns the args
  */
-function islandora_large_image_get_args() {
-
-  if (variable_get('islandora_lossless', FALSE)) {
+function islandora_large_image_get_args($lossless) {
+  if ($lossless) {
     $args[] = " -define numrlvls=6";
     $args[] = " -define jp2:tilewidth=1024";
     $args[] = " -define jp2:tileheight=1024";
