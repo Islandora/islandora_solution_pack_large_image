@@ -67,9 +67,18 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       }
     }
 
-    if ($kakadu && !$lossless) {
+    if ($kakadu) {
       // Create JP2.
-      $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+      if (!$lossless) {
+        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+      }
+      else {
+        $derivative_file = islandora_large_image_kdu_compress(
+          $uploaded_file,
+          "temporary://{$base_name}_JP2.jp2",
+          'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
+        );
+      }
       if ($derivative_file === FALSE) {
         $to_return['messages'][] = array(
           'message' => t("Kakadu failed. Trying ImageMagick ..."),
@@ -251,6 +260,13 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
  *   Returns the newly generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
+  // Kakadu can't convert bit depth of 1.
+  $identify = islandora_large_image_get_identify();
+  $file = drupal_realpath($src);
+  $depth = exec(escapeshellcmd("$identify -format %[depth] $file"));
+  if ($depth == 1) {
+    return FALSE;
+  }
   // Kinda weird logic, to avoid changing the source.
   $unlink_source = FALSE;
 
