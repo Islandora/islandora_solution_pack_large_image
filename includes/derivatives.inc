@@ -57,10 +57,11 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if (!$lossless) {
       $identify = islandora_large_image_get_identify();
       $file = drupal_realpath($uploaded_file);
-      $height = exec(escapeshellcmd("$identify -format \"%h\" $file"));
-      $width = exec(escapeshellcmd("$identify -format \"%W\" $file"));
-      $y_resolution = exec(escapeshellcmd("$identify -format \"%y\" $file"));
-      $x_resolution = exec(escapeshellcmd("$identify -format \"%x\" $file"));
+      // Define all these variables in one call for considerable performance gain.
+      list($height, $width, $y_resolution, $x_resolution) = explode(
+        ',',
+        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file"))
+      );
       if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
         ($height < 1024 || $width < 1024)) {
         $lossless = TRUE;
