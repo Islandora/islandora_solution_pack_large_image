@@ -90,7 +90,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         $kakadu = FALSE;
       }
     }
-    else {
+    if (!$kakadu) {
       $derivative_file = islandora_large_image_imagemagick_convert(
         $uploaded_file,
         "temporary://{$base_name}_JP2.jp2",
