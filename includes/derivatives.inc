@@ -52,10 +52,34 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
       $kakadu = FALSE;
     }
+    $lossless = variable_get('islandora_lossless', FALSE);
+    // Use lossless if the image would look too bad with compression.
+    if (!$lossless) {
+      $identify = islandora_large_image_get_identify();
+      $file = drupal_realpath($uploaded_file);
+      // Define all these variables in one call for a large performance gain.
+      list($height, $width, $y_resolution, $x_resolution) = explode(
+        ',',
+        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file"))
+      );
+      if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
+        ($height < 1024 || $width < 1024)) {
+        $lossless = TRUE;
+      }
+    }
 
     if ($kakadu) {
       // Create JP2.
-      $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+      if (!$lossless) {
+        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+      }
+      else {
+        $derivative_file = islandora_large_image_kdu_compress(
+          $uploaded_file,
+          "temporary://{$base_name}_JP2.jp2",
+          'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
+        );
+      }
       if ($derivative_file === FALSE) {
         $to_return['messages'][] = array(
           'message' => t("Kakadu failed. Trying ImageMagick ..."),
@@ -67,7 +91,11 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       }
     }
     if (!$kakadu) {
-      $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JP2.jp2", islandora_large_image_get_args());
+      $derivative_file = islandora_large_image_imagemagick_convert(
+        $uploaded_file,
+        "temporary://{$base_name}_JP2.jp2",
+        islandora_large_image_get_args($lossless)
+      );
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -233,6 +261,13 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
  *   Returns the newly generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
+  // Kakadu can't convert bit depth of 1.
+  $identify = islandora_large_image_get_identify();
+  $file = drupal_realpath($src);
+  $depth = exec(escapeshellcmd("$identify -format %[depth] $file"));
+  if ($depth == 1) {
+    return FALSE;
+  }
   // Kinda weird logic, to avoid changing the source.
   $unlink_source = FALSE;
 
@@ -377,12 +412,15 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
 
 /**
  * Return preconfigured paramaters for ImageMagick JP2 creation.
+ *
+ * @param bool $lossless
+ *   Weather or not the conversion should be lossless.
+ *
  * @return array
  *   Returns the args
  */
-function islandora_large_image_get_args() {
-
-  if (variable_get('islandora_lossless', FALSE)) {
+function islandora_large_image_get_args($lossless) {
+  if ($lossless) {
     $args[] = " -define numrlvls=6";
     $args[] = " -define jp2:tilewidth=1024";
     $args[] = " -define jp2:tileheight=1024";
