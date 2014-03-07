@@ -346,7 +346,7 @@ function islandora_large_image_imagemagick_convert($src, $dest, $args) {
   // make the $source image the first parameter and $dest the last.
   // See http://www.imagemagick.org/Usage/basics/#cmdline
   $command = escapeshellarg($src) . ' ' . implode(' ', $args) . ' ' . escapeshellarg($dest);
-  $output = '';
+  $output = array();
   $ret = -1;
   if (_imagemagick_convert_exec($command, $output, $ret) !== TRUE) {
     $variables = array(
