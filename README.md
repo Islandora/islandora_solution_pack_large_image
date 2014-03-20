@@ -32,6 +32,13 @@ To use Kakadu, make sure that `kdu_compress` and `kdu_expand` are avaliable to t
 
 ![Configuration](http://i.imgur.com/bS5ph4A.png)
 
+## Troubleshooting/Issues
+
+Having problems or solved a problem? Check out the Islandora google groups for a solution.
+
+* [Islandora Group](https://groups.google.com/forum/?hl=en&fromgroups#!forum/islandora)
+* [Islandora Dev Group](https://groups.google.com/forum/?hl=en&fromgroups#!forum/islandora-dev)
+
 ## Maintainers/Sponsors
 Current maintainers:
 
