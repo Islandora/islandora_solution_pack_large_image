@@ -10,9 +10,9 @@
  */
 function islandora_large_image_menu() {
   $items = array();
-  $items['admin/islandora/large_image'] = array(
-    'title' => 'Large Image Collection',
-    'description' => 'Configure the Large Image Solution Pack.',
+  $items['admin/islandora/solution_pack_config/large_image'] = array(
+    'title' => 'Large Images',
+    'description' => 'Define ingest behavior, and select viewer image viewer.',
     'page callback' => 'drupal_get_form',
     'access arguments' => array('administer site configuration'),
     'page arguments' => array('islandora_large_image_admin'),
