@@ -21,12 +21,12 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 ## Configuration
 
-Configure the image-tool kit to use ImageMagick rather than GD in Administration Â» Configuration Â» Media Â» Image Toolkit (admin/config/media/image-toolkit). If GD is selected, TN and JPG datastreams will not be generated.
+Configure the image-tool kit to use ImageMagick rather than GD in Administration > Configuration > Media > Image Toolkit (admin/config/media/image-toolkit). If GD is selected, TN and JPG datastreams will not be generated.
 
 ![Configuration](http://i.imgur.com/O3sQPeO.png)
 
 
-Select configuration options and viewer in Administration Â» Islandora Â» Large Image Collection (admin/islandora/large_image).
+Select configuration options and viewer in Administration > Islandora > Large Image Collection (admin/islandora/large_image).
 
 To use Kakadu, make sure that `kdu_compress` and `kdu_expand` are avaliable to the Apache user. Often users will create symbolic links from `/usr/local/bin/kdu_compress` to their installation of Kakadu that comes bundled with [Adore-Djatoka](http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Installation). Make sure that the required dynamic libriraries that come with Kakadu are excessible to `kdu_compress` and `kdu_expand`. If they are not present, attempting to run either command from the terminal will inform you it's libraries are missing. You can also use a symbolic link from `/usr/local/lib` to include these libraries, remember to restart the terminal so your changes take affect. Also, make sure the php settings allow for enough memory and upload size: upload_max_filesize, post_max_size and memory_limit.
 
