@@ -37,6 +37,7 @@ function islandora_large_image_get_uploaded_file(AbstractObject $object) {
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_jp2_derivative(AbstractObject $object, $force = TRUE) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   if ($force || !isset($object['JP2'])) {
     $to_return = array(
@@ -44,7 +45,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       'messages' => array(),
     );
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
-
+    $temp_uploaded_file = islandora_temp_file_entry($uploaded_file);
     // Create JP2 with kakadu.
     module_load_include('inc', 'islandora_large_image', 'includes/utilities');
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
@@ -69,16 +70,20 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     }
 
     if ($kakadu) {
+      $temp_file = NULL;
+      $temp_uri = "temporary://{$base_name}_JP2.jp2";
       // Create JP2.
       if (!$lossless) {
-        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, $temp_uri);
+        $temp_file = islandora_temp_file_entry($temp_uri);
       }
       else {
         $derivative_file = islandora_large_image_kdu_compress(
           $uploaded_file,
-          "temporary://{$base_name}_JP2.jp2",
+          $temp_uri,
           'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
         );
+        $temp_file = islandora_temp_file_entry($temp_uri);
       }
       if ($derivative_file === FALSE) {
         $to_return['messages'][] = array(
@@ -93,9 +98,10 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if (!$kakadu) {
       $derivative_file = islandora_large_image_imagemagick_convert(
         $uploaded_file,
-        "temporary://{$base_name}_JP2.jp2",
+        $temp_uri,
         islandora_large_image_get_args($lossless)
       );
+      $temp_file = islandora_temp_file_entry($temp_uri);
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -122,8 +128,11 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         );
       }
     }
-    file_unmanaged_delete($uploaded_file);
-    file_unmanaged_delete($derivative_file);
+    // Clean up the temp Derivative file.
+    file_delete($temp_file);
+
+    // Clean up the temp uploaded file.
+    file_delete($temp_uploaded_file);
     return $to_return;
   }
 }
@@ -141,6 +150,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_jpg_derivative(AbstractObject $object, $force = TRUE) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   if ($force || !isset($object['JPG'])) {
     $to_return = array(
@@ -149,10 +159,14 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
     );
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
+    $temp_uploaded_file = islandora_temp_file_entry($uploaded_file);
+
     $args = array();
     $args[] = '-resize ' . escapeshellarg("600 x 800");
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
+    $temp_uri = "temporary://{$base_name}_JPG.jpg";
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, $temp_uri, $args);
+    $temp_derivative_file = islandora_temp_file_entry($temp_uri);
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
         'message' => t('Failed to create JPG derivative.'),
@@ -178,9 +192,10 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
         );
       }
     }
+    // Clean up temp files.
+    file_delete($temp_uploaded_file);
+    file_delete($temp_derivative_file);
 
-    file_unmanaged_delete($uploaded_file);
-    file_unmanaged_delete($derivative_file);
     return $to_return;
   }
 }
@@ -198,6 +213,7 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_tn_derivative(AbstractObject $object, $force = TRUE) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   if ($force || !isset($object['TN'])) {
     $to_return = array(
@@ -206,11 +222,13 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
     );
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
-
+    $temp_uploaded_file = islandora_temp_file_entry($uploaded_file);
     $args = array();
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
     $args[] = '-resize ' . escapeshellarg("200 x 200");
-    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
+    $temp_uri = "temporary://{$base_name}_TN.jpg";
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, $temp_uri, $args);
+    $temp_derivative_file = islandora_temp_file_entry($temp_uri);
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
         'message' => t('Failed to create TN derivative.'),
@@ -237,8 +255,9 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
       }
     }
 
-    file_unmanaged_delete($uploaded_file);
-    file_unmanaged_delete($derivative_file);
+    file_delete($temp_uploaded_file);
+    file_delete($temp_derivative_file);
+
     return $to_return;
   }
 }
@@ -261,6 +280,7 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
  *   Returns the newly generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   // Kakadu can't convert bit depth of 1.
   $identify = islandora_large_image_get_identify();
   $file = drupal_realpath($src);
@@ -287,7 +307,9 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   }
   // Default args.
   $args = isset($args) ? $args : '-rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes';
+
   $src = drupal_realpath($src);
+
   $dest = drupal_realpath($dest);
   $ret = -1;
   $ret_palette = 0;
@@ -305,7 +327,6 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
     $command = "$kdu_compress -i \"$src\" -o \"$dest\" $args 2>&1";
     exec($command, $output, $ret_palette);
   }
-
   if ($ret != 0 || $ret_palette != 0) {
     return FALSE;
   }
@@ -530,10 +551,12 @@ function islandora_large_image_create_all_derivatives(AbstractObject $object, $f
   $base_name = str_replace(':', '-', $object->id);
   $uploaded_file = islandora_large_image_get_uploaded_file($object, $base_name);
   if ($uploaded_file) {
+    $temp_uploaded_file = islandora_temp_file_entry($uploaded_file);
     $jp2 = islandora_large_image_create_JP2_derivative($object, $uploaded_file, $base_name, $force);
     $jpg = islandora_large_image_create_JPG_derivative($object, $uploaded_file, $base_name, $force);
     $tn = islandora_large_image_create_TN_derivative($object, $uploaded_file, $base_name, $force);
-    return $jp2 && $jpg && $tn && file_unmanaged_delete($uploaded_file);
+    file_delete($temp_uploaded_file);
+    return $jp2 && $jpg && $tn;
   }
   return FALSE;
 }
