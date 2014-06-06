@@ -54,6 +54,10 @@ body.two-sidebars .islandora-large-image-sidebar {
     width: 100%;
 }
 
+a#clip {
+  margin-left: 5px;
+}
+
 @media all and (min-width: 768px) {
 
   body.no-sidebars .islandora-large-image-content {
