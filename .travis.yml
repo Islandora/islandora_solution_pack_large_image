@@ -15,10 +15,10 @@ before_install:
   - git clone -b 7.x git://github.com/Islandora/islandora_solution_pack_collection.git
   - export ISLANDORA_DIR=$HOME/islandora
   - $HOME/islandora/tests/scripts/travis_setup.sh
+  - sudo sh $CATALINA_HOME/travis/scripts/adore.sh
   - cd $HOME/drupal-*
   - ln -s $TRAVIS_BUILD_DIR sites/all/modules/islandora_solution_pack_large_image
   - ln -s $HOME/islandora_solution_pack_collection sites/all/modules/islandora_solution_pack_collection
-  - sudo sh $CATALINA_HOME/travis/scripts/adore.sh
   - drush dl imagemagick
   - drush en --user=1 --yes imagemagick islandora_basic_collection islandora_large_image
 script:
