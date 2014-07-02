@@ -221,7 +221,10 @@ function islandora_large_image_preprocess_islandora_large_image(&$variables) {
   if ($viewer) {
     if (strpos($viewer, 'islandora-openseadragon') !== FALSE) {
       if (isset($islandora_object['JP2']) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $islandora_object['JP2'])) {
-        $variables['image_clip'] = l(t('Clip Image'), "islandora/object/{$islandora_object->id}/print", array('attributes' => array('title' => 'Clip Image', 'id' => 'clip')));
+        $variables['image_clip'] = theme(
+          'islandora_openseadragon_clipper',
+          array('pid' => $islandora_object->id)
+        );
       }
     }
     $variables['islandora_content'] = $viewer;
