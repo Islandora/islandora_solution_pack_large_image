@@ -77,12 +77,6 @@ function islandora_large_image_islandora_required_objects(IslandoraTuque $connec
   $large_image_content_model->owner = 'fedoraAdmin';
   $large_image_content_model->label = 'Islandora Large Image Content Model';
   $large_image_content_model->models = 'fedora-system:ContentModel-3.0';
-  // ISLANDORACM Datastream.
-  $datastream = $large_image_content_model->constructDatastream('ISLANDORACM', 'X');
-  $datastream->label = 'Islandora content model';
-  $datastream->mimetype = 'text/xml';
-  $datastream->setContentFromFile("$module_path/xml/islandora_sp_large_image_cmodel.xml", FALSE);
-  $large_image_content_model->ingestDatastream($datastream);
   // DS-COMPOSITE-MODEL Datastream.
   $datastream = $large_image_content_model->constructDatastream('DS-COMPOSITE-MODEL', 'X');
   $datastream->label = 'DS-COMPOSITE-MODEL';
