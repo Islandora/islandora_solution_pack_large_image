@@ -2,18 +2,21 @@
 
 ## Introduction
 
-The large image solution pack loads all required Fedora objects, and creates an empty collection object to accept tiff's and create derivatives.
+The large image solution pack loads all required Fedora objects, and creates an empty collection object to accept tiff's and dng's and create derivatives.
 
 ## Requirements
 
-This module requires teh following modules/libraries:
+This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
 * [ImageMagick](https://drupal.org/project/imagemagick)
 * Kakadu (bundled with Djatoka)
+* [UFRaw](http://ufraw.sourceforge.net)
 
 *To successfully create derivative data streams ImageMagick (TN & JPG) and Kakadu (JP2) need to be installed on the server.*
+
+*To successfully create derivative data streams from DNG files, UFRaw needs to be installed on the server.*
 
 ## Installation
 

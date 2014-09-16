@@ -32,6 +32,18 @@ function islandora_large_image_requirements($phase) {
         'description' => $t('Ensure that adore-djatoka is installed and that kdu_compress is accessible by PHP.'),
       );
     }
+
+    $command = 'command -v ufraw >/dev/null 2>&1';
+    exec($command, $out, $ret);
+
+    if ($ret != 0) {
+      $requirements['ufraw'] = array(
+        'title' => $t("UFRaw"),
+        'value' => $t("Not installed"),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('Ensure that ufraw is installed.'),
+      );
+    }
   }
   return $requirements;
 }
@@ -54,4 +66,14 @@ function islandora_large_image_uninstall() {
   islandora_install_solution_pack('islandora_large_image', 'uninstall');
   $variables = array('islandora_large_image_viewers');
   array_walk($variables, 'variable_del');
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Alert user to install UFRaw
+ */
+function islandora_large_image_update_7001(&$sandbox) {
+  $t = get_t();
+  drupal_set_message($t('The Large Image solution pack now supports raw files (dng). You must install UFRaw to support dng files'));
 }

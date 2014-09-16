@@ -49,7 +49,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     module_load_include('inc', 'islandora_large_image', 'includes/utilities');
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
     $mime = strtolower($object['OBJ']->mimetype);
-    if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+    if ($mime == 'image/jpeg' || $mime == 'image/jpg' || $mime == 'image/x-adobe-dng') {
       $kakadu = FALSE;
     }
     $lossless = variable_get('islandora_lossless', FALSE);

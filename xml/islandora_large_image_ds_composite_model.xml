@@ -25,6 +25,7 @@
   </dsTypeModel>
   <dsTypeModel ID="OBJ">
     <form MIME="image/tiff"/>
+    <form MIME="image/x-adobe-dng"/>
   </dsTypeModel>
   <dsTypeModel ID="TECHMD">
     <form MIME="text/xml"/>

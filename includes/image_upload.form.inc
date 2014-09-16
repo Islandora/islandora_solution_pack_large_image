@@ -12,13 +12,13 @@
  *   The drupal form.
  * @param array $form_state
  *   The drupal form state.
- * 
+ *
  * @return array
  *   The drupal form definition.
  */
 function islandora_large_image_image_upload_form(array $form, array &$form_state) {
   $upload_size = min((int) ini_get('post_max_size'), (int) ini_get('upload_max_filesize'));
-  $extensions = array('tiff tif');
+  $extensions = array('tiff tif dng');
   return array(
     'file' => array(
       '#title' => t('Image'),
