@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The large image solution pack loads all required Fedora objects, and creates an empty collection object to accept tiff's and create derivatives.
+The large image solution pack loads all required Fedora objects and creates an empty collection object to accept TIFFs and create derivatives.
 
 ## Requirements
 
@@ -13,7 +13,7 @@ This module requires teh following modules/libraries:
 * [ImageMagick](https://drupal.org/project/imagemagick)
 * Kakadu (bundled with Djatoka)
 
-*To successfully create derivative data streams ImageMagick (TN & JPG) and Kakadu (JP2) need to be installed on the server.*
+*To successfully create derivative data streams, ImageMagick (for TN & JPG) and Kakadu (for JP2) need to be installed on the server.*
 
 ## Installation
 
@@ -21,14 +21,14 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 ## Configuration
 
-Configure the image-tool kit to use ImageMagick rather than GD in Administration > Configuration > Media > Image Toolkit (admin/config/media/image-toolkit). If GD is selected, TN and JPG datastreams will not be generated.
+Configure the image-toolkit to use ImageMagick rather than GD in Administration > Configuration > Media > Image Toolkit (admin/config/media/image-toolkit). If GD is selected, TN and JPG datastreams will not be generated.
 
 ![Configuration](http://i.imgur.com/O3sQPeO.png)
 
 
 Select configuration options and viewer in Administration > Islandora > Large Image Collection (admin/islandora/large_image).
 
-To use Kakadu, make sure that `kdu_compress` and `kdu_expand` are avaliable to the Apache user. Often users will create symbolic links from `/usr/local/bin/kdu_compress` to their installation of Kakadu that comes bundled with [Adore-Djatoka](http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Installation). Make sure that the required dynamic libriraries that come with Kakadu are excessible to `kdu_compress` and `kdu_expand`. If they are not present, attempting to run either command from the terminal will inform you it's libraries are missing. You can also use a symbolic link from `/usr/local/lib` to include these libraries, remember to restart the terminal so your changes take affect. Also, make sure the php settings allow for enough memory and upload size: upload_max_filesize, post_max_size and memory_limit.
+To use Kakadu, make sure that `kdu_compress` and `kdu_expand` are available to the Apache user. Often users will create symbolic links from `/usr/local/bin/kdu_compress` to their installation of Kakadu that comes bundled with [Adore-Djatoka](http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Installation). Make sure that the required dynamic libraries that come with Kakadu are accessible to `kdu_compress` and `kdu_expand`. If they are not present, attempting to run either command from the terminal will inform you that the libraries are missing. You can also use a symbolic link from `/usr/local/lib` to include these libraries. Remember to restart the terminal so your changes take affect. Also, make sure the php settings allow for enough memory and upload size: `upload_max_filesize`, `post_max_size` and `memory_limit`.
 
 ![Configuration](http://i.imgur.com/bS5ph4A.png)
 
@@ -42,7 +42,7 @@ Having problems or solved a problem? Check out the Islandora google groups for a
 ## Maintainers/Sponsors
 Current maintainers:
 
-* [Nick Ruest](https://github.com/ruebot)
+* [Alan Stanley](https://github.com/ajstanley)
 
 ## Development
 
