@@ -80,7 +80,7 @@ function islandora_large_image_islandora_required_objects(IslandoraTuque $connec
   // DS-COMPOSITE-MODEL Datastream.
   $datastream = $large_image_content_model->constructDatastream('DS-COMPOSITE-MODEL', 'X');
   $datastream->label = 'DS-COMPOSITE-MODEL';
-  $datastream->mimetype = 'text/xml';
+  $datastream->mimetype = 'application/xml';
   $datastream->setContentFromFile("$module_path/xml/islandora_large_image_ds_composite_model.xml", FALSE);
   $large_image_content_model->ingestDatastream($datastream);
   // Large Image Collection.
@@ -92,7 +92,7 @@ function islandora_large_image_islandora_required_objects(IslandoraTuque $connec
   // Collection Policy Datastream.
   $datastream = $large_image_collection->constructDatastream('COLLECTION_POLICY', 'X');
   $datastream->label = 'Collection policy';
-  $datastream->mimetype = 'text/xml';
+  $datastream->mimetype = 'application/xml';
   $datastream->setContentFromFile("$module_path/xml/islandora_large_image_collection_policy.xml", FALSE);
   $large_image_collection->ingestDatastream($datastream);
   // TN Datastream.
