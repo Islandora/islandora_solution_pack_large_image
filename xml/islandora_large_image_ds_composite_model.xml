@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
   <!-- using this as a guide -->
   <dsTypeModel ID="DC">
@@ -13,12 +14,12 @@
     <form FORMAT_URI="http://www.loc.gov/mods/v3" MIME="application/xml"/>
   </dsTypeModel>
   <dsTypeModel ID="TN" ORDERED="false">
-    <form MIME="image/jpg"/>
     <form MIME="image/jpeg"/>
     <form MIME="image/png"/>
+    <form MIME="image/gif"/>
   </dsTypeModel>
   <dsTypeModel ID="JPG" ORDERED="false">
-    <form MIME="image/jpg"/>
+    <form MIME="image/jpeg"/>
   </dsTypeModel>
   <dsTypeModel ID="JP2" ORDERED="false">
     <form MIME="image/jp2"/>
