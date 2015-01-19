@@ -306,14 +306,12 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
     exec($command, $output, $ret_palette);
   }
 
-  if ($ret != 0 || $ret_palette != 0) {
-    return FALSE;
-  }
-
   if ($unlink_source) {
     file_unmanaged_delete($src);
   }
-
+  if ($ret != 0 || $ret_palette != 0) {
+    return FALSE;
+  }
   return $dest;
 }
 
