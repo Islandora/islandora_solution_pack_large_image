@@ -23,7 +23,7 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 Configure the image-toolkit to use ImageMagick rather than GD in Administration > Configuration > Media > Image Toolkit (admin/config/media/image-toolkit). If GD is selected, TN and JPG datastreams will not be generated.
 
-![Configuration](http://i.imgur.com/O3sQPeO.png)
+![Configuration](https://camo.githubusercontent.com/6ae64673716ddf1f58d0e4856d7d7a5d79845506/687474703a2f2f692e696d6775722e636f6d2f4f33735150654f2e706e67)
 
 
 Select configuration options and viewer in Administration > Islandora > Large Image Collection (admin/islandora/large_image).
