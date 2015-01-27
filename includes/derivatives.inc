@@ -94,8 +94,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       $derivative_file = islandora_large_image_imagemagick_convert(
         $uploaded_file,
         "temporary://{$base_name}_JP2.jp2",
-        islandora_large_image_get_args($lossless)
-      );
+        array_merge(islandora_large_image_get_args($lossless), array("-depth 8")));
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -265,7 +264,8 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   $identify = islandora_large_image_get_identify();
   $file = drupal_realpath($src);
   $depth = exec(escapeshellcmd("$identify -format %[depth] $file"));
-  if ($depth == 1) {
+
+  if ($depth < 8) {
     return FALSE;
   }
   // Kinda weird logic, to avoid changing the source.
