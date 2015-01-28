@@ -37,6 +37,7 @@ function islandora_large_image_get_uploaded_file(AbstractObject $object) {
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_jp2_derivative(AbstractObject $object, $force = TRUE) {
+  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   if ($force || !isset($object['JP2'])) {
     $to_return = array(
@@ -44,31 +45,31 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       'messages' => array(),
     );
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
+    $file_path = drupal_realpath($uploaded_file);
+    $depth = islandora_large_image_get_bit_depth($file_path);
 
     // Create JP2 with kakadu.
-    module_load_include('inc', 'islandora_large_image', 'includes/utilities');
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
     $mime = strtolower($object['OBJ']->mimetype);
-    if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+    if ($mime == 'image/jpeg' || $mime == 'image/jpg' || $depth < 8) {
       $kakadu = FALSE;
     }
     $lossless = variable_get('islandora_lossless', FALSE);
     // Use lossless if the image would look too bad with compression.
-    $file = drupal_realpath($uploaded_file);
     if (!$lossless) {
       $identify = islandora_large_image_get_identify();
       // Define all these variables in one call for a large performance gain.
       list($height, $width, $y_resolution, $x_resolution) = explode(
         ',',
-        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file"))
+        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file_path"))
       );
       if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
         ($height < 1024 || $width < 1024)) {
         $lossless = TRUE;
       }
     }
-    $depth = islandora_large_image_get_bit_depth($file);
-    if ($kakadu && $depth >= 8) {
+
+    if ($kakadu) {
       // Create JP2.
       if (!$lossless) {
         $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
