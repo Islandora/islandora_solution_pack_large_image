@@ -38,11 +38,12 @@ function islandora_large_image_check_imagemagick_for_jpeg2000() {
  *
  * @param string $file_path
  *   The file to determine the bit depth of.
- * 
+ *
  * @return bool|int
  *   The bit depth of the image if the file exists, FALSE otherwise.
  */
 function islandora_large_image_get_bit_depth($file_path) {
+  module_load_include('inc', 'islandora_large_image', 'includes/derivatives');
   if (file_exists($file_path)) {
     $identify = islandora_large_image_get_identify();
     return exec(escapeshellcmd("$identify -format %[depth] $file_path"));

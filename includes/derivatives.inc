@@ -266,6 +266,7 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
  */
 function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
   // Kakadu does a poor job of converting low bit depths.
+  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
   if (islandora_large_image_get_bit_depth(drupal_realpath($src)) < 8) {
     return FALSE;
   }
