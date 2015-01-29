@@ -35,9 +35,10 @@ function islandora_large_image_check_imagemagick_for_jpeg2000() {
 
 /**
  * Determine the bit depth of the image file.
- * 
+ *
  * @param string $file_path
  *   The file to determine the bit depth of.
+ * 
  * @return bool|int
  *   The bit depth of the image if the file exists, FALSE otherwise.
  */
