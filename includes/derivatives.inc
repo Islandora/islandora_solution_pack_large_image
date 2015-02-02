@@ -37,6 +37,7 @@ function islandora_large_image_get_uploaded_file(AbstractObject $object) {
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_jp2_derivative(AbstractObject $object, $force = TRUE) {
+  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   if ($force || !isset($object['JP2'])) {
     $to_return = array(
@@ -44,23 +45,23 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       'messages' => array(),
     );
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
+    $depth = islandora_large_image_get_bit_depth($uploaded_file);
 
     // Create JP2 with kakadu.
-    module_load_include('inc', 'islandora_large_image', 'includes/utilities');
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
     $mime = strtolower($object['OBJ']->mimetype);
-    if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+    if ($mime == 'image/jpeg' || $mime == 'image/jpg' || $depth < 8) {
       $kakadu = FALSE;
     }
     $lossless = variable_get('islandora_lossless', FALSE);
     // Use lossless if the image would look too bad with compression.
     if (!$lossless) {
       $identify = islandora_large_image_get_identify();
-      $file = drupal_realpath($uploaded_file);
       // Define all these variables in one call for a large performance gain.
+      $file_path = drupal_realpath($uploaded_file);
       list($height, $width, $y_resolution, $x_resolution) = explode(
         ',',
-        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file"))
+        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file_path"))
       );
       if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
         ($height < 1024 || $width < 1024)) {
@@ -91,11 +92,14 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       }
     }
     if (!$kakadu) {
+      $args = islandora_large_image_get_args($lossless);
+      if ($depth < 8) {
+        $args = array_merge($args, array("-depth 8"));
+      }
       $derivative_file = islandora_large_image_imagemagick_convert(
         $uploaded_file,
         "temporary://{$base_name}_JP2.jp2",
-        islandora_large_image_get_args($lossless)
-      );
+        $args);
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -261,13 +265,12 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
  *   Returns the newly generated file uri or FALSE if the conversion failed
  */
 function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
-  // Kakadu can't convert bit depth of 1.
-  $identify = islandora_large_image_get_identify();
-  $file = drupal_realpath($src);
-  $depth = exec(escapeshellcmd("$identify -format %[depth] $file"));
-  if ($depth == 1) {
+  // Kakadu does a poor job of converting low bit depths.
+  module_load_include('inc', 'islandora_large_image', 'includes/utilities');
+  if (islandora_large_image_get_bit_depth($src) < 8) {
     return FALSE;
   }
+
   // Kinda weird logic, to avoid changing the source.
   $unlink_source = FALSE;
 
