@@ -45,61 +45,67 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       'messages' => array(),
     );
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
-    $depth = islandora_large_image_get_bit_depth($uploaded_file);
-
-    // Create JP2 with kakadu.
-    $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
-    $mime = strtolower($object['OBJ']->mimetype);
-    if ($mime == 'image/jpeg' || $mime == 'image/jpg' || $depth < 8) {
-      $kakadu = FALSE;
-    }
     $lossless = variable_get('islandora_lossless', FALSE);
-    // Use lossless if the image would look too bad with compression.
-    if (!$lossless) {
-      $identify = islandora_large_image_get_identify();
-      // Define all these variables in one call for a large performance gain.
-      $file_path = drupal_realpath($uploaded_file);
-      list($height, $width, $y_resolution, $x_resolution) = explode(
-        ',',
-        exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file_path"))
-      );
-      if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
-        ($height < 1024 || $width < 1024)) {
-        $lossless = TRUE;
-      }
+    if (islandora_large_image_is_jp2($uploaded_file) && !$lossless) {
+      $derivative_file = $uploaded_file;
     }
+    else {
 
-    if ($kakadu) {
-      // Create JP2.
-      if (!$lossless) {
-        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
-      }
-      else {
-        $derivative_file = islandora_large_image_kdu_compress(
-          $uploaded_file,
-          "temporary://{$base_name}_JP2.jp2",
-          'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
-        );
-      }
-      if ($derivative_file === FALSE) {
-        $to_return['messages'][] = array(
-          'message' => t("Kakadu failed. Trying ImageMagick ..."),
-          'type' => 'dsm',
-          'severity' => 'status',
-        );
-        // Force retry with ImageMagick if Kakadu has failed.
+      $depth = islandora_large_image_get_bit_depth($uploaded_file);
+
+      // Create JP2 with kakadu.
+      $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
+      $mime = strtolower($object['OBJ']->mimetype);
+      if ($mime == 'image/jpeg' || $mime == 'image/jpg' || $depth < 8) {
         $kakadu = FALSE;
       }
-    }
-    if (!$kakadu) {
-      $args = islandora_large_image_get_args($lossless);
-      if ($depth < 8) {
-        $args = array_merge($args, array("-depth 8"));
+      // Use lossless if the image would look too bad with compression.
+      if (!$lossless) {
+        $identify = islandora_large_image_get_identify();
+        // Define all these variables in one call for a large performance gain.
+        $file_path = drupal_realpath($uploaded_file);
+        list($height, $width, $y_resolution, $x_resolution) = explode(
+          ',',
+          exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file_path"))
+        );
+        if (((int) $x_resolution < 300 || (int) $y_resolution < 300) ||
+          ($height < 1024 || $width < 1024)) {
+          $lossless = TRUE;
+        }
       }
-      $derivative_file = islandora_large_image_imagemagick_convert(
-        $uploaded_file,
-        "temporary://{$base_name}_JP2.jp2",
-        $args);
+
+      if ($kakadu) {
+        // Create JP2.
+        if (!$lossless) {
+          $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+        }
+        else {
+          $derivative_file = islandora_large_image_kdu_compress(
+            $uploaded_file,
+            "temporary://{$base_name}_JP2.jp2",
+            'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
+          );
+        }
+        if ($derivative_file === FALSE) {
+          $to_return['messages'][] = array(
+            'message' => t("Kakadu failed. Trying ImageMagick ..."),
+            'type' => 'dsm',
+            'severity' => 'status',
+          );
+          // Force retry with ImageMagick if Kakadu has failed.
+          $kakadu = FALSE;
+        }
+      }
+      if (!$kakadu) {
+        $args = islandora_large_image_get_args($lossless);
+        if ($depth < 8) {
+          $args = array_merge($args, array("-depth 8"));
+        }
+        $derivative_file = islandora_large_image_imagemagick_convert(
+          $uploaded_file,
+          "temporary://{$base_name}_JP2.jp2",
+          $args);
+      }
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -489,6 +495,28 @@ function islandora_large_image_is_tiff($file) {
 
   return $is_tiff;
 }
+
+/**
+ * Uses Imagemagick's identify to determine if the file is a JP2.
+ *
+ * @param string $file
+ *   A file-system path to the file in question.
+ *
+ * @return bool
+ *   A boolean indicating if the file contains a JP2.
+ */
+function islandora_large_image_is_jp2($file) {
+  $identify = islandora_large_image_get_identify();
+
+  $file = drupal_realpath($file);
+
+  $codec = exec(escapeshellcmd("$identify -format \"%m\" $file"));
+
+  $is_jp2 = (strtolower($codec) == 'jp2');
+
+  return $is_jp2;
+}
+
 
 /**
  * Attempt to get the "identify" executable...
