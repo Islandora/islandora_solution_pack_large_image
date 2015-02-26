@@ -2,11 +2,11 @@
 
 ## Introduction
 
-The large image solution pack loads all required Fedora objects and creates an empty collection object to accept TIFFs and create derivatives.
+The Large Image Solution Pack loads all required Fedora objects and creates an empty collection object to accept TIFFs and JPEG2000s (JP2) and create derivatives.
 
 ## Requirements
 
-This module requires teh following modules/libraries:
+This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
