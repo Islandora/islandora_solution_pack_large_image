@@ -24,7 +24,7 @@ function islandora_large_image_image_upload_form(array $form, array &$form_state
       '#title' => t('Image'),
       '#type' => 'managed_file',
       '#required' => TRUE,
-      '#description' => filter_xss(t('Select image to upload.<br/>Files must be less than <strong>!size MB.</strong><br/>Allowed file types: <strong>!ext.</strong>', array('!size' => $upload_size, '!ext' => $extensions[0])), array('br', 'b')),
+      '#description' => t('Select image to upload.<br/>Files must be less than <strong>@size MB.</strong><br/>Allowed file types: <strong>@ext.</strong>', array('@size' => $upload_size, '@ext' => $extensions[0])), array('br', 'b'),
       '#default_value' => isset($form_state['values']['files']) ? $form_state['values']['files'] : NULL,
       '#upload_location' => 'temporary://',
       '#upload_validators' => array(
