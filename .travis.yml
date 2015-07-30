@@ -19,7 +19,7 @@ before_install:
   - cd $HOME/drupal-*
   - ln -s $TRAVIS_BUILD_DIR sites/all/modules/islandora_solution_pack_large_image
   - ln -s $HOME/islandora_solution_pack_collection sites/all/modules/islandora_solution_pack_collection
-  - sudo sh $TRAVIS_BUILD_DIR/adore.sh
+  - sudo sh $TRAVIS_BUILD_DIR/tests/scripts/adore.sh
   - drush dl imagemagick
   - drush en --user=1 --yes imagemagick islandora_basic_collection islandora_large_image
 script:
