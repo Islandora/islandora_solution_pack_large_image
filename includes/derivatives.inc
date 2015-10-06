@@ -497,8 +497,8 @@ function islandora_large_image_is_tiff($file) {
   $is_tiff = strrpos(strtolower($codec), 'tiff');
 
   /* Avoid false negatives after strrpos */
-  if ($is_tiff !== false) {
-    $is_tiff = true;
+  if ($is_tiff !== FALSE) {
+    $is_tiff = TRUE;
   }
 
   return $is_tiff;
