@@ -341,7 +341,10 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
  *   The destination file path if successful otherwise FALSE.
  */
 function islandora_large_image_imagemagick_convert($src, $dest, $args) {
-  $src = drupal_realpath($src) . '[0]';
+  $src = drupal_realpath($src);
+  if (islandora_large_image_is_tiff($src)) {
+    $src = $src . '[0]';
+  }
   $dest = drupal_realpath($dest);
   $context = array(
     'source' => $src,
@@ -491,7 +494,12 @@ function islandora_large_image_is_tiff($file) {
 
   $codec = exec(escapeshellcmd("$identify -format \"%m\" $file"));
 
-  $is_tiff = (strtolower($codec) == 'tiff');
+  $is_tiff = strrpos(strtolower($codec), 'tiff');
+
+  /* Avoid false negatives after strrpos */
+  if ($is_tiff !== FALSE) {
+    $is_tiff = TRUE;
+  }
 
   return $is_tiff;
 }
