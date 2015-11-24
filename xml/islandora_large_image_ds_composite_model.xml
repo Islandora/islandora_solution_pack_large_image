@@ -13,6 +13,10 @@
   <dsTypeModel ID="MODS" optional="true">
     <form FORMAT_URI="http://www.loc.gov/mods/v3" MIME="application/xml"/>
   </dsTypeModel>
+  <dsTypeModel ID="OBJ">
+    <form MIME="image/tiff"/>
+    <form MIME="image/jp2"/>
+  </dsTypeModel>
   <dsTypeModel ID="TN" ORDERED="false">
     <form MIME="image/jpeg"/>
     <form MIME="image/png"/>
@@ -22,10 +26,6 @@
     <form MIME="image/jpeg"/>
   </dsTypeModel>
   <dsTypeModel ID="JP2" ORDERED="false">
-    <form MIME="image/jp2"/>
-  </dsTypeModel>
-  <dsTypeModel ID="OBJ" optional="true">
-    <form MIME="image/tiff"/>
     <form MIME="image/jp2"/>
   </dsTypeModel>
   <dsTypeModel ID="TECHMD">
