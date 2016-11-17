@@ -63,7 +63,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       if (!$lossless) {
         $identify = islandora_large_image_get_identify();
         // Define all these variables in one call for a large performance gain.
-        $file_path = drupal_realpath($uploaded_file);
+        $file_path = escapeshellarg(drupal_realpath($uploaded_file));
         list($height, $width, $y_resolution, $x_resolution) = explode(
           ',',
           exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file_path"))
@@ -469,7 +469,7 @@ function islandora_large_image_get_args($lossless) {
 function islandora_large_image_is_uncompressed_tiff($file) {
   $identify = islandora_large_image_get_identify();
 
-  $file = drupal_realpath($file);
+  $file = escapeshellarg(drupal_realpath($file));
 
   $compression = exec(escapeshellcmd("$identify -format \"%C\" $file"));
 
@@ -490,7 +490,7 @@ function islandora_large_image_is_uncompressed_tiff($file) {
 function islandora_large_image_is_tiff($file) {
   $identify = islandora_large_image_get_identify();
 
-  $file = drupal_realpath($file);
+  $file = escapeshellarg(drupal_realpath($file));
 
   $codec = exec(escapeshellcmd("$identify -format \"%m\" $file"));
 
