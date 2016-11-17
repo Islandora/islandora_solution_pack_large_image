@@ -63,7 +63,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       if (!$lossless) {
         $identify = islandora_large_image_get_identify();
         // Define all these variables in one call for a large performance gain.
-        $file_path = escapeshellarg(drupal_realpath($uploaded_file));
+        $file_path = drupal_realpath($uploaded_file);
         list($height, $width, $y_resolution, $x_resolution) = explode(
           ',',
           exec(escapeshellcmd("$identify -format \"%h,%W,%y,%x\" $file_path"))
