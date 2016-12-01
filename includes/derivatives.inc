@@ -469,7 +469,7 @@ function islandora_large_image_get_args($lossless) {
 function islandora_large_image_is_uncompressed_tiff($file) {
   $identify = islandora_large_image_get_identify();
 
-  $file = drupal_realpath($file);
+  $file = escapeshellarg(drupal_realpath($file));
 
   $compression = exec(escapeshellcmd("$identify -format \"%C\" $file"));
 
@@ -490,7 +490,7 @@ function islandora_large_image_is_uncompressed_tiff($file) {
 function islandora_large_image_is_tiff($file) {
   $identify = islandora_large_image_get_identify();
 
-  $file = drupal_realpath($file);
+  $file = escapeshellarg(drupal_realpath($file));
 
   $codec = exec(escapeshellcmd("$identify -format \"%m\" $file"));
 
