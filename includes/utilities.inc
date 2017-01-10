@@ -47,7 +47,7 @@ function islandora_large_image_get_bit_depth($file_uri) {
   if (file_exists($file_uri)) {
     $file_path = drupal_realpath($file_uri);
     $identify = islandora_large_image_get_identify();
-    return exec(escapeshellcmd("$identify -format %[depth] $file_path"));
+    return exec(escapeshellcmd("$identify -format %[depth] " . escapeshellarg($file_path)));
   }
   else {
     return FALSE;
