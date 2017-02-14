@@ -113,9 +113,9 @@ function islandora_large_image_islandora_required_objects(IslandoraTuque $connec
 }
 
 /**
- * Implements hook_islandora_xml_form_builder_forms().
+ * Implements hook_xml_form_builder_forms().
  */
-function islandora_large_image_islandora_xml_form_builder_forms() {
+function islandora_large_image_xml_form_builder_forms() {
   $module_path = drupal_get_path('module', 'islandora_large_image');
   return array(
     'Large image MODS form' => array(
@@ -125,9 +125,9 @@ function islandora_large_image_islandora_xml_form_builder_forms() {
 }
 
 /**
- * Implements hook_islandora_xml_form_builder_form_associations().
+ * Implements hook_xml_form_builder_form_associations().
  */
-function islandora_large_image_islandora_xml_form_builder_form_associations() {
+function islandora_large_image_xml_form_builder_form_associations() {
   return array(
     'islandora_large_image_mods_form' => array(
       'content_model' => 'islandora:sp_large_image_cmodel',
