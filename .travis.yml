@@ -34,6 +34,6 @@ script:
   - ant -buildfile sites/all/modules/islandora_solution_pack_large_image/build.xml lint
   - drush coder-review --reviews=production,security,style,i18n,potx,sniffer islandora_large_image
   - phpcpd --names *.module,*.inc,*.test sites/all/modules/islandora_solution_pack_large_image
-  - drush test-run --uri=http://localhost:8081 "Islandora Large Image"
+  - php scripts/run-tests.sh --php `phpenv which php` --url http://localhost:8081 --verbose "Islandora Large Image"
 notifications:
   irc: "irc.freenode.org#islandora"
