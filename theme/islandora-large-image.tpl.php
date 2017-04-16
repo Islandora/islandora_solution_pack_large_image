@@ -23,6 +23,7 @@
 ?>
 <div class="islandora-large-image-object islandora" vocab="http://schema.org/" prefix="dcterms: http://purl.org/dc/terms/" typeof="ImageObject">
   <div class="islandora-large-image-content-wrapper clearfix">
+    <?php print theme('islandora_solr_search_return_link'); ?>
     <?php if ($islandora_content): ?>
       <?php if (isset($image_clip)): ?>
         <?php print $image_clip; ?>
