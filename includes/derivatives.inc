@@ -564,13 +564,8 @@ function islandora_large_image_create_all_derivatives(AbstractObject $object, $f
     drupal_set_message(t('Could not create image derivatives for %s. No image file was uploaded.', array('%s' => $object->id)), 'error');
     return FALSE;
   }
-  $base_name = str_replace(':', '-', $object->id);
-  $uploaded_file = islandora_large_image_get_uploaded_file($object, $base_name);
-  if ($uploaded_file) {
-    $jp2 = islandora_large_image_create_JP2_derivative($object, $uploaded_file, $base_name, $force);
-    $jpg = islandora_large_image_create_JPG_derivative($object, $uploaded_file, $base_name, $force);
-    $tn = islandora_large_image_create_TN_derivative($object, $uploaded_file, $base_name, $force);
-    return $jp2 && $jpg && $tn && file_unmanaged_delete($uploaded_file);
-  }
-  return FALSE;
+  $jp2 = islandora_large_image_create_JP2_derivative($object, $force);
+  $jpg = islandora_large_image_create_JPG_derivative($object, $force);
+  $tn = islandora_large_image_create_TN_derivative($object, $force);
+  return $jp2 && $jpg && $tn && file_unmanaged_delete($uploaded_file);
 }
