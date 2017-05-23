@@ -149,9 +149,9 @@ function islandora_large_image_islandora_sp_large_image_cmodel_islandora_view_ob
 }
 
 /**
- * Implements hook_preprocess().
+ * Implements template_preprocess_HOOK().
  */
-function islandora_large_image_preprocess_islandora_large_image(&$variables) {
+function template_preprocess_islandora_large_image(&$variables) {
   drupal_add_js('misc/form.js');
   drupal_add_js('misc/collapse.js');
   $islandora_object = $variables['islandora_object'];
