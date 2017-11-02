@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Large Image Solution Pack loads all required Fedora objects and creates an empty collection object to accept TIFFs and JPEG2000s (JP2) and create derivatives.
+The Large Image Solution Pack loads all required Fedora objects and creates an empty collection object to accept TIFFs and JPEG2000s (JP2) and create derivatives, and also supports the installation of image viewers that can accommodate the larger resolution.
 
 ## Requirements
 
@@ -34,7 +34,7 @@ To use Kakadu, make sure that `kdu_compress` is available to the Apache user. Of
 
 ## Documentation
 
-Further documentation for this module is available at [our wiki](https://wiki.duraspace.org/display/ISLANDORA/Large+Image+Solution+Pack)
+Further documentation for this module is available at [our wiki](https://wiki.duraspace.org/display/ISLANDORA/Large+Image+Solution+Pack).
 
 ## Troubleshooting/Issues
 
