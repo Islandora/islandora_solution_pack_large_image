@@ -2,8 +2,7 @@
 
 /**
  * @file
- * This file contains all the functions for image manipulation used in the large
- * image solution pack.
+ * This file contains image manipulation functions used in the large image SP.
  */
 
 /**
@@ -216,38 +215,50 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
     );
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
-
-    $args = array();
-    $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-    $args[] = '-resize ' . escapeshellarg("200 x 200");
-    $args[] = '-colorspace RGB';
-    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
-    if ($derivative_file === FALSE) {
+    $colorspace = islandora_large_image_get_colorspace($uploaded_file);
+    if ($colorspace === FALSE) {
       $to_return['messages'][] = array(
-        'message' => t('Failed to create TN derivative.'),
+        'message' => t('Failed to create TN derivative. Could not identify source OBJ.'),
         'type' => 'watchdog',
         'severity' => WATCHDOG_WARNING,
       );
     }
     else {
-      $added_successfully = islandora_large_image_add_datastream($object, 'TN', $derivative_file, 'image/jpeg', t('Thumbnail'));
-      if (TRUE === $added_successfully) {
+      // Only apply colorspace changes if not in the RGB family.
+      $args = array();
+      $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
+      $args[] = '-resize ' . escapeshellarg("200 x 200");
+      $isrgb = stripos($colorspace, 'rgb');
+      if ($isrgb === FALSE) {
+        $args[] = '-colorspace sRGB';
+      }
+      $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
+      if ($derivative_file === FALSE) {
         $to_return['messages'][] = array(
-          'message' => t('Created TN derivative.'),
-          'type' => 'dsm',
-          'severity' => 'status',
+          'message' => t('Failed to create TN derivative.'),
+          'type' => 'watchdog',
+          'severity' => WATCHDOG_WARNING,
         );
-        $to_return['success'] = TRUE;
       }
       else {
-        $to_return['messages'][] = array(
-          'message' => t('Failed to add TN derivative to the object. Error message: @message', array('@message' => $added_successfully)),
-          'type' => 'dsm',
-          'severity' => 'warning',
-        );
+        $added_successfully = islandora_large_image_add_datastream($object, 'TN', $derivative_file, 'image/jpeg', t('Thumbnail'));
+        if (TRUE === $added_successfully) {
+          $to_return['messages'][] = array(
+            'message' => t('Created TN derivative.'),
+            'type' => 'dsm',
+            'severity' => 'status',
+          );
+          $to_return['success'] = TRUE;
+        }
+        else {
+          $to_return['messages'][] = array(
+            'message' => t('Failed to add TN derivative to the object. Error message: @message', array('@message' => $added_successfully)),
+            'type' => 'dsm',
+            'severity' => 'warning',
+          );
+        }
       }
     }
-
     file_unmanaged_delete($uploaded_file);
     file_unmanaged_delete($derivative_file);
     return $to_return;
@@ -261,7 +272,7 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
  * provided.
  *
  * @param string $src
- *   The source file to pass to kdu_compress
+ *   The source file to pass to kdu_compress.
  * @param string $dest
  *   The destination file which kdu_compress will generate.
  * @param string $args
@@ -526,6 +537,25 @@ function islandora_large_image_is_jp2($file) {
   return $is_jp2;
 }
 
+/**
+ * Uses Imagemagick's identify to get the colorspace of a file.
+ *
+ * @param string $file
+ *   A file-system path to the file in question.
+ *
+ * @return string|bool
+ *   The colorspace of the image if exists, or FALSE if
+ *   identify command exists/fails with 1.
+ */
+function islandora_large_image_get_colorspace($file) {
+  $identify = islandora_large_image_get_identify();
+
+  $escaped_file = escapeshellarg(drupal_realpath($file));
+
+  $colorspace = exec(escapeshellcmd("$identify -format %[colorspace] -regard-warnings ") . $escaped_file, $output, $procret);
+
+  return !$procret ? $colorspace : FALSE;
+}
 
 /**
  * Attempt to get the "identify" executable...
@@ -540,7 +570,7 @@ function islandora_large_image_get_identify() {
   // Get path for convert.
   $convert = variable_get('imagemagick_convert', 'convert');
 
-  // Replace "convert" with "identify"
+  // Replace "convert" with "identify".
   $identify = str_replace('convert', 'identify', $convert);
 
   return $identify;
@@ -548,8 +578,6 @@ function islandora_large_image_get_identify() {
 
 /**
  * Legacy function until derivative regeneration is fully flushed out for UI.
- *
- * @TODO: This is legacy functionality need to remove and update it.
  *
  * @param AbstractObject $object
  *   The object to add derivatives to.
@@ -559,6 +587,8 @@ function islandora_large_image_get_identify() {
  *
  * @return bool
  *   TRUE if all derivatives were created successfully, FALSE otherwise.
+ *
+ * @TODO: This is legacy functionality need to remove and update it.
  */
 function islandora_large_image_create_all_derivatives(AbstractObject $object, $force = TRUE) {
   if (!isset($object['OBJ'])) {
