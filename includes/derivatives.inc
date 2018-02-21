@@ -552,7 +552,7 @@ function islandora_large_image_get_colorspace($file) {
 
   $escaped_file = escapeshellarg(drupal_realpath($file));
 
-  $colorspace = exec(escapeshellcmd("$identify -format %[colorspace] -regard-warnings ") . $escaped_file, $output, $procret);
+  $colorspace = exec(escapeshellcmd("$identify -quiet -format %[colorspace] ") . $escaped_file, $output, $procret);
 
   return !$procret ? $colorspace : FALSE;
 }
