@@ -28,7 +28,7 @@ function islandora_large_image_requirements($phase) {
       $requirements['kakadu'] = array(
         'title' => $t("Kakadu Image Compression"),
         'value' => $t("Not installed"),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => REQUIREMENT_WARNING,
         'description' => $t('Ensure that adore-djatoka is installed and that kdu_compress is accessible by PHP.'),
       );
     }
