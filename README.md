@@ -10,10 +10,12 @@ This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
-* [ImageMagick](https://drupal.org/project/imagemagick)
-* Kakadu (bundled with Djatoka)
+* [ImageMagick](https://drupal.org/project/imagemagick) (for `TN` and `JPG`
+    derivative generation)
 
-*To successfully create derivative data streams, ImageMagick (for TN & JPG) and Kakadu (for JP2) need to be installed on the server.*
+For JP2 derivative generation, we require at least one of:
+* Kakadu (bundled with Djatoka)
+* Imagemagick with JPEG 2000 support
 
 ## Installation
 
@@ -24,7 +26,6 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 Configure the image-toolkit to use ImageMagick rather than GD in Administration > Configuration > Media > Image Toolkit (admin/config/media/image-toolkit). If GD is selected, TN and JPG datastreams will not be generated.
 
 ![Configuration](https://camo.githubusercontent.com/6ae64673716ddf1f58d0e4856d7d7a5d79845506/687474703a2f2f692e696d6775722e636f6d2f4f33735150654f2e706e67)
-
 
 Select configuration options and viewer in Administration > Islandora > Large Image Collection (admin/islandora/large_image).
 

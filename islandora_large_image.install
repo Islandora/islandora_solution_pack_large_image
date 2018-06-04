@@ -9,31 +9,91 @@
  * Implements hook_requirements().
  */
 function islandora_large_image_requirements($phase) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
   $requirements = array();
-  if ($phase == 'install') {
-    $t = get_t();
-    $out = array();
-    $ret = 1;
+  $t = get_t();
 
-    $command = 'command -v kdu_compress >/dev/null 2>&1';
 
-    if (islandora_deployed_on_windows()) {
-      $command = 'kdu_compress >NUL 2>&1';
+  if (in_array($phase, array('install', 'runtime'))) {
+    $has_kakadu = _islandora_large_image_install_has_kakadu();
+    $has_jp2_imagemagick = _islandora_large_image_install_has_imagemagick_with_jpeg2000_support();
+    if ($has_kakadu) {
+      $requirements['islandora_large_image_kakadu'] = array(
+        'title' => $t("Islandora Solution Pack Large Image: Kakadu Image Compression"),
+        'value' => $t("Installed"),
+        'severity' => REQUIREMENT_INFO,
+        'description' => $t('The kdu_compress executable is accessible.'),
+      );
     }
-
-    exec($command, $out, $ret);
-
-    if ($ret != 0) {
-      $requirements['kakadu'] = array(
-        'title' => $t("Kakadu Image Compression"),
+    else {
+      $requirements['islandora_large_image_kakadu'] = array(
+        'title' => $t("Islandora Solution Pack Large Image: Kakadu Image Compression"),
+        'value' => $t("Not installed"),
+        'severity' => REQUIREMENT_INFO,
+        'description' => $t('The kdu_compress executable is not accessible.'),
+      );
+    }
+    if ($has_jp2_imagemagick) {
+      $requirements['islandora_large_image_imagemagick'] = array(
+        'title' => $t("Islandora Solution Pack Large Image: Imagemagick Image Compression"),
+        'value' => $t("Installed"),
+        'severity' => REQUIREMENT_INFO,
+        'description' => $t('Imagemagick is present and appears to support JPEG2000.'),
+      );
+    }
+    else {
+      $requirements['islandora_large_image_imagemagick'] = array(
+        'title' => $t("Islandora Solution Pack Large Image: Imagemagick Image Compression"),
+        'value' => $t("Not installed"),
+        'severity' => REQUIREMENT_INFO,
+        'description' => $t('Imagemagick does not appears to support JPEG2000.'),
+      );
+    }
+    if (!($has_kakadu || $has_jp2_imagemagick)) {
+      $requirements['islandora_large_image_encoder'] = array(
+        'title' => $t("Islandora Solution Pack Large Image: JPEG 2000 image encoder"),
         'value' => $t("Not installed"),
         'severity' => REQUIREMENT_WARNING,
-        'description' => $t('Ensure that adore-djatoka is installed and that kdu_compress is accessible by PHP.'),
+        'description' => $t('A JPEG 2000 encoder is not installed/configured.'),
+      );
+    }
+    else {
+      $requirements['islandora_large_image_encoder'] = array(
+        'title' => $t("Islandora Solution Pack Large Image: JPEG 2000 image encoder"),
+        'value' => $t("Installed"),
+        'severity' => REQUIREMENT_OK,
+        'description' => $t('A JPEG 2000 encoder is installed.'),
       );
     }
   }
   return $requirements;
+}
+
+/**
+ * Helper to test if Kakadu appears to be available.
+ */
+function _islandora_large_image_install_has_kakadu() {
+  module_load_include('inc', 'islandora', 'includes/utilities');
+
+  $out = array();
+  $ret = 1;
+
+  $command = 'command -v kdu_compress >/dev/null 2>&1';
+
+  if (islandora_deployed_on_windows()) {
+    $command = 'kdu_compress >NUL 2>&1';
+  }
+
+  exec($command, $out, $ret);
+
+  return $ret == 0;
+}
+
+/**
+ * Helper to test that imagemagick appears to have JPEG 2000 support.
+ */
+function _islandora_large_image_install_has_imagemagick_with_jpeg2000_support() {
+  require_once __DIR__ . '/includes/utilities.inc';
+  return islandora_large_image_check_imagemagick_for_jpeg2000();
 }
 
 /**
