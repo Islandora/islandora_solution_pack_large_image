@@ -12,7 +12,6 @@ function islandora_large_image_requirements($phase) {
   $requirements = array();
   $t = get_t();
 
-
   if (in_array($phase, array('install', 'runtime'))) {
     $has_kakadu = _islandora_large_image_install_has_kakadu();
     $has_jp2_imagemagick = _islandora_large_image_install_has_imagemagick_with_jpeg2000_support();
