@@ -51,7 +51,7 @@ function islandora_large_image_requirements($phase) {
       $requirements['islandora_large_image_encoder'] = array(
         'title' => $t("Islandora Solution Pack Large Image: JPEG 2000 image encoder"),
         'value' => $t("Not installed"),
-        'severity' => REQUIREMENT_WARNING,
+        'severity' => REQUIREMENT_ERROR,
         'description' => $t('A JPEG 2000 encoder is not installed/configured.'),
       );
     }
