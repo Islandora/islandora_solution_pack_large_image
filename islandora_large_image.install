@@ -26,9 +26,9 @@ function islandora_large_image_requirements($phase) {
     else {
       $requirements['islandora_large_image_kakadu'] = array(
         'title' => $t("Islandora Solution Pack Large Image: Kakadu Image Compression"),
-        'value' => $t("Not installed"),
+        'value' => $t("Not found"),
         'severity' => REQUIREMENT_INFO,
-        'description' => $t('The kdu_compress executable is not accessible.'),
+        'description' => $t('The kdu_compress executable was not found.  If you wish to use Kakadu Image Compression it must be enabled and configured on the solution pack configuration page.'),
       );
     }
     if ($has_jp2_imagemagick) {
@@ -75,11 +75,12 @@ function _islandora_large_image_install_has_kakadu() {
 
   $out = array();
   $ret = 1;
-
-  $command = 'command -v kdu_compress >/dev/null 2>&1';
+  $kdu_compress = variable_get('islandora_kakadu_url', 'kdu_compress');
+  $escaped_kdu_compress = escapeshellarg($kdu_compress);
+  $command = "command -v $escaped_kdu_compress >/dev/null 2>&1";
 
   if (islandora_deployed_on_windows()) {
-    $command = 'kdu_compress >NUL 2>&1';
+    $command = "$escaped_kdu_compress >NUL 2>&1";
   }
 
   exec($command, $out, $ret);
