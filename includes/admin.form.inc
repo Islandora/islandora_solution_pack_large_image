@@ -97,7 +97,14 @@ function islandora_large_image_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
   switch ($op) {
     case 'edit-reset':
-      variable_del('islandora_large_image_viewers');
+      $variables = array(
+        'islandora_large_image_viewers',
+        'islandora_use_kakadu',
+        'islandora_lossless',
+        'islandora_large_image_uncompress_tiff',
+        'islandora_kakadu_url',
+      );
+      array_walk($variables, 'variable_del');
       break;
   }
 }
