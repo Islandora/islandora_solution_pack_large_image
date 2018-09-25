@@ -117,6 +117,6 @@ function islandora_large_image_uninstall() {
     'islandora_lossless',
     'islandora_large_image_uncompress_tiff',
     'islandora_kakadu_url',
-    );
+  );
   array_walk($variables, 'variable_del');
 }
