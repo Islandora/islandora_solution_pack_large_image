@@ -112,6 +112,12 @@ function islandora_large_image_install() {
 function islandora_large_image_uninstall() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   islandora_install_solution_pack('islandora_large_image', 'uninstall');
-  $variables = array('islandora_large_image_viewers');
+  $variables = array(
+    'islandora_large_image_viewers',
+    'islandora_use_kakadu',
+    'islandora_lossless',
+    'islandora_large_image_uncompress_tiff',
+    'islandora_kakadu_url',
+  );
   array_walk($variables, 'variable_del');
 }
