@@ -159,7 +159,7 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
     $args = array();
-    $args[] = '-resize ' . escapeshellarg("600 x 800");
+    $args[] = '-resize ' . escapeshellarg(variable_get('derivative_med_size', "600 x 800"));
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
     $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
     if ($derivative_file === FALSE) {
@@ -227,7 +227,7 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
       // Only apply colorspace changes if not in the RGB family.
       $args = array();
       $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-      $args[] = '-resize ' . escapeshellarg("200 x 200");
+      $args[] = '-resize ' . escapeshellarg(variable_get('derivative_tn_size', "200 x 200"));
       $isrgb = stripos($colorspace, 'rgb');
       if ($isrgb === FALSE) {
         $args[] = '-colorspace sRGB';
