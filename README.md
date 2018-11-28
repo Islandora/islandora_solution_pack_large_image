@@ -33,6 +33,26 @@ To use Kakadu, make sure that `kdu_compress` is available to the Apache user. Of
 
 ![Configuration](https://camo.githubusercontent.com/3730f86cd795d7d989e1cbb9b5dfca5221228379/687474703a2f2f692e696d6775722e636f6d2f625335706834412e706e67)
 
+
+####  To change the size of the thumbnail and medium size image derivatives
+These are handled as maximum sizes (retains original x to y ratio) and does not crop.
+
+```shell 
+# For thumbnail size
+drush vset derivative_tn_size "200 x 200"
+
+# For Medium sized JPEG size
+drush vset derivative_med_size "600 x 800"
+```
+To remove
+```shell
+# For thumbnail size
+drush vdel derivative_tn_size
+
+# For Medium sized JPEG size
+drush vdel derivative_med_size
+```
+
 ## Documentation
 
 Further documentation for this module is available at [our wiki](https://wiki.duraspace.org/display/ISLANDORA/Large+Image+Solution+Pack).
