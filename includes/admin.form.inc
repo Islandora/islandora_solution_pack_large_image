@@ -86,7 +86,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
       '#type' => 'textfield',
       '#title' => t('Derivative TN Size'),
       '#default_value' => $get_default_value('derivative_tn_size', '200 x 200'),
-      '#description' => t('The medium size image derivative is default is <b>600 x 800</b> (maximum width by maximum height), not effect relative ratio. Please use a number space the lowercase letter x space and a number.<br/><span style="color:red">WARNING: This will set the size for all thumbnail images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
+      '#description' => t('The TN size image derivative is default is <b>200 x 200</b> (maximum width by maximum height), not effect relative ratio. Please use a number space the lowercase letter x space and a number.<br/><span style="color:red">WARNING: This will set the size for all thumbnail images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
       '#required' => TRUE,
     ),
   );
@@ -142,7 +142,6 @@ function islandora_large_image_admin_validate($form, &$form_state) {
   // Checks to see if the values are exclusively numeric.
   foreach ($check_size_inputs as $derivative_size => $form_state_values) {
     $checking_numbers = explode(" x ", $form_state['values'][$form_state_values]);
-
     foreach ($checking_numbers as $key => $value) {
         if (!is_numeric($value) || count($checking_numbers) != 2 ){
           $non_number_found = 1;
