@@ -31,7 +31,7 @@ Select configuration options and viewer in Administration > Islandora > Large Im
 
 To use Kakadu, make sure that `kdu_compress` is available to the Apache user. Often users will create symbolic links from `/usr/local/bin/kdu_compress` to their installation of Kakadu that comes bundled with [Adore-Djatoka](http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Installation). If the executable resides elsewhere on the server and no soft link has been created, be sure to provide the full path to the executable on the configuration page. Make sure that the required dynamic libraries that come with Kakadu are accessible to `kdu_compress` and `kdu_expand`. If they are not present, attempting to run either command from the terminal will inform you that the libraries are missing. You can also use a symbolic link from `/usr/local/lib` to include these libraries. Remember to restart the terminal so your changes take affect. Also, make sure the php settings allow for enough memory and upload size: `upload_max_filesize`, `post_max_size` and `memory_limit`.
 
-![Configuration](https://camo.githubusercontent.com/3730f86cd795d7d989e1cbb9b5dfca5221228379/687474703a2f2f692e696d6775722e636f6d2f625335706834412e706e67)
+![Configuration](https://user-images.githubusercontent.com/2738244/49761778-f5dc9200-fc95-11e8-9892-12b1edf4a987.png)
 
 
 ####  To change the size of the thumbnail and medium size image derivatives
