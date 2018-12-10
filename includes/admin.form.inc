@@ -142,12 +142,14 @@ function islandora_large_image_admin_validate($form, &$form_state) {
   // Checks to see if the values are exclusively numeric.
   foreach ($check_size_inputs as $derivative_size => $form_state_values) {
     $checking_numbers = explode(" x ", $form_state['values'][$form_state_values]);
+
     foreach ($checking_numbers as $key => $value) {
-        if (!is_numeric($value)){
+        if (!is_numeric($value) || count($checking_numbers) != 2 ){
           $non_number_found = 1;
         }
     }
   }
+
   if ($non_number_found == 1) {
     form_set_error('colour', t('The Derivative sizes must follow the expected format. #0000 x #0000'));
   }
