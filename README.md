@@ -37,7 +37,7 @@ To use Kakadu, make sure that `kdu_compress` is available to the Apache user. Of
 ####  To change the size of the thumbnail and medium size image derivatives
 These are handled as maximum sizes (retains original x to y ratio) and does not crop.
 
-```shell 
+```shell
 # For thumbnail size
 drush vset derivative_tn_size "200 x 200"
 

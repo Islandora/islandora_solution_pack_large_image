@@ -75,6 +75,20 @@ function islandora_large_image_admin(array $form, array &$form_state) {
         ),
       ),
     ),
+    'derivative_med_size' => array(
+      '#type' => 'textfield',
+      '#title' => t('Derivative Medium Size'),
+      '#default_value' => $get_default_value('derivative_med_size', '600 x 800'),
+      '#description' => t('The medium size image derivative is default is <b>600 x 800</b> (maximum width by maximum height), not effect relative ratio. Please use a number space the lowercase letter x space and a number.<br/><span style="color:red">WARNING: This will set the size for all medium sized images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
+      '#required' => TRUE,
+    ),
+    'derivative_tn_size' => array(
+      '#type' => 'textfield',
+      '#title' => t('Derivative TN Size'),
+      '#default_value' => $get_default_value('derivative_tn_size', '200 x 200'),
+      '#description' => t('The medium size image derivative is default is <b>600 x 800</b> (maximum width by maximum height), not effect relative ratio. Please use a number space the lowercase letter x space and a number.<br/><span style="color:red">WARNING: This will set the size for all thumbnail images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
+      '#required' => TRUE,
+    ),
   );
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   $form += islandora_viewers_form('islandora_large_image_viewers', 'image/jp2');
@@ -103,6 +117,8 @@ function islandora_large_image_admin_submit($form, &$form_state) {
         'islandora_lossless',
         'islandora_large_image_uncompress_tiff',
         'islandora_kakadu_url',
+        'derivative_med_size',
+        'derivative_tn_size',
       );
       array_walk($variables, 'variable_del');
       break;
@@ -114,4 +130,25 @@ function islandora_large_image_admin_submit($form, &$form_state) {
  */
 function islandora_update_kakadu_url_div($form, $form_state) {
   return $form['islandora_kakadu_url'];
+}
+
+/**
+* Function to validate the inputs before saving.
+*/
+function islandora_large_image_admin_validate($form, &$form_state) {
+  $check_size_inputs=['derivative_med_size','derivative_tn_size'];
+  $non_number_found=0;
+
+  // Checks to see if the values are exclusively numeric.
+  foreach ($check_size_inputs as $derivative_size => $form_state_values) {
+    $checking_numbers = explode(" x ", $form_state['values'][$form_state_values]);
+    foreach ($checking_numbers as $key => $value) {
+        if (!is_numeric($value)){
+          $non_number_found = 1;
+        }
+    }
+  }
+  if ($non_number_found == 1) {
+    form_set_error('colour', t('The Derivative sizes must follow the expected format. #0000 x #0000'));
+  }
 }
