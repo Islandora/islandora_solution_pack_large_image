@@ -133,19 +133,19 @@ function islandora_update_kakadu_url_div($form, $form_state) {
 }
 
 /**
-* Function to validate the inputs before saving.
-*/
+ * Function to validate the inputs before saving.
+ */
 function islandora_large_image_admin_validate($form, &$form_state) {
-  $check_size_inputs=['derivative_med_size','derivative_tn_size'];
-  $non_number_found=0;
+  $check_size_inputs = ['derivative_med_size', 'derivative_tn_size'];
+  $non_number_found = 0;
 
   // Checks to see if the values are exclusively numeric.
   foreach ($check_size_inputs as $derivative_size => $form_state_values) {
     $checking_numbers = explode(" x ", $form_state['values'][$form_state_values]);
     foreach ($checking_numbers as $key => $value) {
-        if (!is_numeric($value) || count($checking_numbers) != 2 ){
-          $non_number_found = 1;
-        }
+      if (!is_numeric($value) || count($checking_numbers) != 2) {
+        $non_number_found = 1;
+      }
     }
   }
 
