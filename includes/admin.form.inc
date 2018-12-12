@@ -75,21 +75,62 @@ function islandora_large_image_admin(array $form, array &$form_state) {
         ),
       ),
     ),
-    'derivative_med_size' => array(
-      '#type' => 'textfield',
-      '#title' => t('Derivative Medium Size'),
-      '#default_value' => $get_default_value('derivative_med_size', '600 x 800'),
-      '#description' => t('The medium size image derivative is default is <b>600 x 800</b> (maximum width by maximum height), not effect relative ratio. Please use a number space the lowercase letter x space and a number.<br/><span style="color:red">WARNING: This will set the size for all medium sized images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
-      '#required' => TRUE,
-    ),
-    'derivative_tn_size' => array(
-      '#type' => 'textfield',
-      '#title' => t('Derivative TN Size'),
-      '#default_value' => $get_default_value('derivative_tn_size', '200 x 200'),
-      '#description' => t('The TN size image derivative is default is <b>200 x 200</b> (maximum width by maximum height), not effect relative ratio. Please use a number space the lowercase letter x space and a number.<br/><span style="color:red">WARNING: This will set the size for all thumbnail images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
-      '#required' => TRUE,
-    ),
   );
+  $form['islandora_large_image_thumbnail_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Thumbnail'),
+    '#description' => t('Settings for creating thumbnail derivatives<br/><span style="color:red">WARNING: This will set the size for all medium sized images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
+  );
+  $form['islandora_large_image_thumbnail_fieldset']['islandora_pdf_thumbnail_width'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+        ' type' => 'number',
+    ),
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Maximum Width'),
+    '#description' => t('The width of the thumbnail in pixels.'),
+    '#default_value' => variable_get('islandora_pdf_thumbnail_width', 200),
+    '#size' => 5,
+  );
+  $form['islandora_large_image_thumbnail_fieldset']['islandora_pdf_thumbnail_height'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+        ' type' => 'number',
+    ),
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Maximum Height'),
+    '#description' => t('The height of the thumbnail in pixels.'),
+    '#default_value' => variable_get('islandora_pdf_thumbnail_height', 200),
+    '#size' => 5,
+  );
+  $form['islandora_large_image_preview_fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Preview image'),
+    '#description' => t('Settings for creating preview image derivatives<br/><span style="color:red">WARNING: This will set the size for all medium sized images generated as a derivative. Regenerate derivatives to apply this setting to existing objects.</span>'),
+  );
+  $form['islandora_large_image_preview_fieldset']['islandora_pdf_preview_width'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+        ' type' => 'number',
+    ),
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Maximum Width'),
+    '#description' => t('The maximum width of the preview in pixels.'),
+    '#default_value' => variable_get('islandora_pdf_preview_width', 600),
+    '#size' => 5,
+  );
+  $form['islandora_large_image_preview_fieldset']['islandora_pdf_preview_height'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+        ' type' => 'number',
+    ),
+    '#element_validate' => array('element_validate_number'),
+    '#title' => t('Maximum Height'),
+    '#description' => t('The maximum height of the preview in pixels.'),
+    '#default_value' => variable_get('islandora_pdf_preview_height', 800),
+    '#size' => 5,
+  );
+
   module_load_include('inc', 'islandora', 'includes/solution_packs');
   $form += islandora_viewers_form('islandora_large_image_viewers', 'image/jp2');
   $form['actions'] = array(
@@ -117,8 +158,10 @@ function islandora_large_image_admin_submit($form, &$form_state) {
         'islandora_lossless',
         'islandora_large_image_uncompress_tiff',
         'islandora_kakadu_url',
-        'derivative_med_size',
-        'derivative_tn_size',
+        'islandora_pdf_thumbnail_height',
+        'islandora_pdf_thumbnail_width',
+        'islandora_pdf_preview_height',
+        'islandora_pdf_preview_width',
       );
       array_walk($variables, 'variable_del');
       break;
@@ -136,20 +179,23 @@ function islandora_update_kakadu_url_div($form, $form_state) {
  * Function to validate the inputs before saving.
  */
 function islandora_large_image_admin_validate($form, &$form_state) {
-  $check_size_inputs = ['derivative_med_size', 'derivative_tn_size'];
-  $non_number_found = 0;
+  $failed_checks = 0;
 
   // Checks to see if the values are exclusively numeric.
-  foreach ($check_size_inputs as $derivative_size => $form_state_values) {
-    $checking_numbers = explode(" x ", $form_state['values'][$form_state_values]);
-    foreach ($checking_numbers as $key => $value) {
-      if (!is_numeric($value) || count($checking_numbers) != 2) {
-        $non_number_found = 1;
-      }
-    }
+  if ($form['islandora_large_image_thumbnail_fieldset']['islandora_pdf_thumbnail_width']['#value'] <= 0) {
+    $failed_checks = 1;
+  }
+  if ($form['islandora_large_image_thumbnail_fieldset']['islandora_pdf_thumbnail_height']['#value'] <= 0) {
+    $failed_checks = 1;
+  }
+  if ($form['islandora_large_image_preview_fieldset']['islandora_pdf_preview_width']['#value'] <= 0) {
+    $failed_checks = 1;
+  }
+  if ($form['islandora_large_image_preview_fieldset']['islandora_pdf_preview_height']['#value'] <= 0) {
+    $failed_checks = 1;
   }
 
-  if ($non_number_found == 1) {
-    form_set_error('colour', t('The Derivative sizes must follow the expected format. #0000 x #0000'));
+  if ($failed_checks == 1) {
+    form_set_error('colour', t('The Derivative sizes must be numeric and be larger than zero.'));
   }
 }
