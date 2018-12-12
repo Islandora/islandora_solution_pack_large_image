@@ -84,7 +84,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
   $form['islandora_large_image_thumbnail_fieldset']['islandora_pdf_thumbnail_width'] = array(
     '#type' => 'textfield',
     '#attributes' => array(
-        ' type' => 'number',
+      'type' => 'number',
     ),
     '#element_validate' => array('element_validate_number'),
     '#title' => t('Maximum Width'),
@@ -95,7 +95,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
   $form['islandora_large_image_thumbnail_fieldset']['islandora_pdf_thumbnail_height'] = array(
     '#type' => 'textfield',
     '#attributes' => array(
-        ' type' => 'number',
+      'type' => 'number',
     ),
     '#element_validate' => array('element_validate_number'),
     '#title' => t('Maximum Height'),
@@ -111,7 +111,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
   $form['islandora_large_image_preview_fieldset']['islandora_pdf_preview_width'] = array(
     '#type' => 'textfield',
     '#attributes' => array(
-        ' type' => 'number',
+      'type' => 'number',
     ),
     '#element_validate' => array('element_validate_number'),
     '#title' => t('Maximum Width'),
@@ -122,7 +122,7 @@ function islandora_large_image_admin(array $form, array &$form_state) {
   $form['islandora_large_image_preview_fieldset']['islandora_pdf_preview_height'] = array(
     '#type' => 'textfield',
     '#attributes' => array(
-        ' type' => 'number',
+      'type' => 'number',
     ),
     '#element_validate' => array('element_validate_number'),
     '#title' => t('Maximum Height'),

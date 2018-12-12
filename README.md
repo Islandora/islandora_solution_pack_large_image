@@ -33,10 +33,9 @@ To use Kakadu, make sure that `kdu_compress` is available to the Apache user. Of
 
 ![Configuration](https://user-images.githubusercontent.com/2738244/49761778-f5dc9200-fc95-11e8-9892-12b1edf4a987.png)
 
-#### THUMBNAIL Width & Height
+#### Width & Height
+
 These are handled as maximum sizes (retains original x to y ratio) and does not crop. These values are shared with the [PDF Solution Pack](http://localhost:8000/admin/islandora/solution_pack_config/pdf).
-
-
 
 ## Documentation
 

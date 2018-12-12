@@ -159,7 +159,10 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
     $args = array();
-    $derivative_med_size = t('@width x @height', array('@width' => variable_get('islandora_pdf_preview_width', "600"), '@height' => variable_get('islandora_pdf_preview_height', "800")));
+    $derivative_med_size = t('@width x @height', array(
+      '@width' => variable_get('islandora_pdf_preview_width', "600"),
+      '@height' => variable_get('islandora_pdf_preview_height', "800"),
+    ));
     $args[] = '-resize ' . escapeshellarg($derivative_med_size);
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
     $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
@@ -227,7 +230,10 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
     else {
       // Only apply colorspace changes if not in the RGB family.
       $args = array();
-      $derivative_tn_size = t('@width x @height', array('@width' => variable_get('islandora_pdf_thumbnail_width', "200"), '@height' => variable_get('islandora_pdf_thumbnail_height', "200")));
+      $derivative_tn_size = t('@width x @height', array(
+        '@width' => variable_get('islandora_pdf_thumbnail_width', "200"),
+        '@height' => variable_get('islandora_pdf_thumbnail_height', "200"),
+      ));
       $args[] = '-resize ' . escapeshellarg($derivative_tn_size);
       $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
       $isrgb = stripos($colorspace, 'rgb');
