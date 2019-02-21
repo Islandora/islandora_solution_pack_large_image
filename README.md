@@ -35,7 +35,7 @@ To use Kakadu, make sure that `kdu_compress` is available to the Apache user. Of
 
 #### Width & Height
 
-These are handled as maximum sizes (retains original x to y ratio) and does not crop. These values are shared with the [PDF Solution Pack](http://localhost:8000/admin/islandora/solution_pack_config/pdf).
+These are handled as maximum sizes (retains original x to y ratio) and does not crop. These values are shared with the PDF Solution Pack (admin/islandora/solution_pack_config/pdf).
 
 ## Documentation
 
