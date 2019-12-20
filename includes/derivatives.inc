@@ -236,6 +236,10 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
       ));
       $args[] = '-resize ' . escapeshellarg($derivative_tn_size);
       $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
+      $args[] = '-resize ' . escapeshellarg($derivative_tn_size);
+      $args[] = '-strip';
+      $args[] = '-interlace Plane';
+
       $isrgb = stripos($colorspace, 'rgb');
       if ($isrgb === FALSE) {
         $args[] = '-colorspace sRGB';
