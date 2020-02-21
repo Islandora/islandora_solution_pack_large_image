@@ -445,7 +445,7 @@ function islandora_large_image_add_datastream(AbstractObject $object, $dsid, $fi
  */
 function islandora_large_image_get_args($lossless) {
   if ($lossless) {
-    $args[] = " -define numrlvls=6";
+    $args[] = " -define jp2:numrlvls=6";
     $args[] = " -define jp2:tilewidth=1024";
     $args[] = " -define jp2:tileheight=1024";
     $args[] = " -define jp2:rate=1.0";
@@ -455,10 +455,10 @@ function islandora_large_image_get_args($lossless) {
     $args[] = " -define jp2:mode=int";
   }
   else {
-    $args[] = "-define numrlvls=7";
+    $args[] = "-define jp2:numrlvls=7";
     $args[] = "-define jp2:tilewidth=1024";
     $args[] = "-define jp2:tileheight=1024";
-    $args[] = "-define jp2:rate=0.02348";
+    $args[] = "-define jp2:rate=16";
     $args[] = "-define jp2:prg=rpcl";
     $args[] = "-define jp2:mode=int";
     $args[] = "-define jp2:prcwidth=16383";
